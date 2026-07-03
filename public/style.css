@@ -648,24 +648,24 @@ body {
 
 /* Rankings list */
 .lb-rankings-hdr {
-  display: grid; grid-template-columns: 36px 1fr 52px 60px 46px;
+  display: grid; grid-template-columns: 32px 1fr 42px 54px 42px;
   gap: 6px; padding: 0 12px 6px;
   font-size: .6rem; color: var(--muted); text-transform: uppercase;
   letter-spacing: .08em; font-weight: 700;
 }
 .lb-row {
-  display: grid; grid-template-columns: 36px 1fr 52px 60px 46px;
+  display: grid; grid-template-columns: 32px 1fr 42px 54px 42px;
   gap: 6px; align-items: center; padding: 11px 12px;
   border-bottom: 1px solid var(--border); font-size: .84rem;
 }
 .lb-row:last-child { border-bottom: none; }
 .lb-row.lb-row-me  { background: rgba(79,70,229,.06); border-radius: 8px; }
 .lb-row.lb-row-ai  { background: rgba(180,83,9,.04); }
-.lb-row-rank { font-weight: 800; color: var(--muted); font-size: .78rem; }
-.lb-row-name { font-weight: 600; color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.lb-row-rate { font-weight: 700; color: var(--text); text-align: center; }
-.lb-row-opt  { font-weight: 600; color: var(--accent); text-align: center; font-size: .8rem; }
-.lb-row-games{ font-size: .78rem; color: var(--muted); text-align: center; }
+.lb-row-rank  { font-weight: 800; color: var(--muted); font-size: .78rem; }
+.lb-row-name  { font-weight: 600; color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.lb-row-wins  { font-weight: 700; color: var(--green); text-align: center; }
+.lb-row-dist  { font-weight: 600; color: var(--muted); text-align: center; font-size: .8rem; }
+.lb-row-games { font-size: .78rem; color: var(--muted); text-align: center; }
 .lb-rank-1 { color: #c8960c !important; }
 .lb-rank-2 { color: #888 !important; }
 .lb-rank-3 { color: #a05c28 !important; }
@@ -728,7 +728,7 @@ body {
   border-radius: 6px; padding: 8px 12px; color: var(--accent); text-align: center;
 }
 
-/* ── Responsive ── */
+/* ── Responsive — small mobile ── */
 @media (max-width: 420px) {
   .hdr-center h1    { font-size: 1.25rem; }
   .q-text           { font-size: .8rem; }
@@ -741,7 +741,55 @@ body {
   .wv-day           { padding: 8px 2px; min-height: 72px; }
   .lb-week-grid     { gap: 4px; }
   .lb-rankings-hdr,
-  .lb-row           { grid-template-columns: 30px 1fr 44px 50px 36px; font-size: .78rem; }
+  .lb-row           { grid-template-columns: 26px 1fr 36px 46px 34px; font-size: .76rem; }
+}
+
+/* ── Responsive — laptop / desktop ── */
+@media (min-width: 768px) {
+  #app { max-width: 640px; padding: 18px 20px 80px; gap: 18px; }
+
+  .hdr { height: 64px; }
+  .hdr-center h1  { font-size: 1.9rem; }
+  .hdr-sub        { font-size: .72rem; }
+  .icon-btn svg   { width: 26px; height: 26px; }
+
+  .status-pill    { font-size: .8rem; padding: 5px 18px; }
+  .day-pill       { min-width: 60px; padding: 8px 5px; }
+  .day-pill .dp-name  { font-size: .65rem; }
+  .day-pill .dp-score { font-size: .82rem; }
+
+  .candidate-grid   { max-height: 260px; }
+  .candidate-chip   { min-width: 38px; font-size: .82rem; padding: 4px 8px; }
+  .grid-behavior    { font-size: .76rem; }
+
+  .q-row            { min-height: 60px; padding: 13px 18px; }
+  .slot-hdr         { min-height: 60px; padding: 13px 18px; }
+  .q-text           { font-size: 1rem; }
+  .q-item           { min-height: 40px; padding: 9px 12px; }
+  .q-item-text      { font-size: .92rem; }
+  .question-list    { max-height: 240px; }
+  .type-tab         { font-size: .8rem; min-height: 32px; padding: 0 12px; }
+
+  .text-input       { padding: 13px 16px; font-size: 1.05rem; }
+  .btn-ask          { padding: 13px 26px; font-size: .98rem; }
+
+  .wv-day           { min-height: 68px; }
+  .wv-day-num       { font-size: .82rem; }
+  .wv-day-icon      { font-size: 1.25rem; }
+  .wv-val           { font-size: 1.5rem; }
+
+  .lb-page-hdr      { padding: 0 24px; height: 64px; }
+  #lb-page          { align-items: center; }
+  .lb-my-card, .lb-signup-card { max-width: 700px; width: calc(100% - 32px); }
+  .lb-section       { max-width: 700px; width: 100%; }
+  .lb-my-val        { font-size: 1.3rem; }
+  .lb-row           { font-size: .92rem; padding: 13px 14px; }
+  .lb-day-card      { min-height: 96px; }
+  .lb-day-icon      { font-size: 1.6rem; }
+
+  .reveal-num       { font-size: 3.8rem; }
+  .score-num        { font-size: 2.4rem; }
+  .modal            { max-width: 520px; }
 }
 
 /* ── Donate footer ── */

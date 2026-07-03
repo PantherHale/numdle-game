@@ -224,23 +224,29 @@ def change_password():
 # ── Leaderboard ────────────────────────────────────────────────────────────────
 
 def calculate_streak(user_id):
-    """Count consecutive daily wins ending today or yesterday."""
+    """Count consecutive daily wins/ties ending today or yesterday."""
     with get_db() as db:
         rows = db.execute(
             'SELECT date, outcome FROM game_records WHERE user_id=? ORDER BY date DESC',
             (user_id,)
         ).fetchall()
-    streak = 0
-    today = date.today()
-    expected = today
+    if not rows:
+        return 0
+    today     = date.today()
+    yesterday = today - timedelta(days=1)
+    most_recent = date.fromisoformat(rows[0]['date'])
+    if most_recent < yesterday:
+        return 0  # last game too old — streak broken
+    streak   = 0
+    expected = most_recent
     for row in rows:
         d = date.fromisoformat(row['date'])
         if d > expected:
-            continue  # duplicate/future entry
+            continue  # duplicate
         if d < expected:
-            break     # gap
+            break     # gap in days
         if row['outcome'] in ('human_wins', 'tie'):
-            streak += 1
+            streak  += 1
             expected = d - timedelta(days=1)
         else:
             break
@@ -254,14 +260,11 @@ def leaderboard():
     with get_db() as db:
         rows = db.execute('''
             SELECT u.id, u.username,
-                   COUNT(g.id)  AS total_games,
+                   COUNT(g.id) AS total_games,
                    SUM(CASE WHEN g.outcome='human_wins' THEN 1 ELSE 0 END) AS wins,
                    SUM(CASE WHEN g.outcome='ai_wins'    THEN 1 ELSE 0 END) AS losses,
                    SUM(CASE WHEN g.outcome='tie'        THEN 1 ELSE 0 END) AS ties,
-                   SUM(CASE WHEN g.optimal_distance IS NOT NULL
-                                 AND g.optimal_distance < g.ai_distance THEN 1 ELSE 0 END) AS opt_wins,
-                   SUM(CASE WHEN g.optimal_distance IS NOT NULL THEN 1 ELSE 0 END) AS opt_games,
-                   ROUND(AVG(g.questions_asked), 1) AS avg_questions
+                   ROUND(AVG(g.human_distance), 0) AS avg_human_distance
             FROM users u
             JOIN game_records g ON u.id=g.user_id
             GROUP BY u.id
@@ -304,9 +307,8 @@ def leaderboard():
     for row in rows:
         r = dict(row)
         r['win_rate']     = round(100.0 * r['wins'] / r['total_games'], 1) if r['total_games'] else 0
-        opt_g = r.pop('opt_games', 0) or 0
-        opt_w = r.pop('opt_wins',  0) or 0
-        r['optimal_rate'] = round(100.0 * opt_w / opt_g, 1) if opt_g else None
+        r['win_rate']     = round(100.0 * r['wins'] / r['total_games'], 1) if r['total_games'] else 0
+        r['avg_distance'] = r.get('avg_human_distance')
         r['streak']       = calculate_streak(r['id'])
         r['suspicious']   = is_suspicious(r['id'])
         r['is_me']        = bool(me_user and me_user['id'] == r['id'])
@@ -327,17 +329,18 @@ def leaderboard():
         me_entry = {
             'id': me_user['id'], 'username': me_user['username'],
             'total_games': 0, 'wins': 0, 'losses': 0, 'ties': 0,
-            'win_rate': 0.0, 'optimal_rate': None, 'streak': 0,
-            'avg_questions': None, 'rank': None,
-            'is_me': True, 'is_ai': False, 'suspicious': False,
+            'win_rate': 0.0, 'avg_distance': None, 'streak': 0,
+            'rank': None, 'is_me': True, 'is_ai': False, 'suspicious': False,
         }
 
     # Insert AI entry at correct rank
     if ai_entry:
-        ai_rank = sum(1 for r in result if r.get('rank') and r['win_rate'] > ai_entry['win_rate']) + 1
-        ai_entry['rank'] = ai_rank
         result.append(ai_entry)
-        result.sort(key=lambda x: (-(x['win_rate'] or 0), -(x.get('total_games') or 0)))
+        result.sort(key=lambda x: (-(x.get('wins') or 0), (x.get('avg_distance') or 9999)))
+        for i, r in enumerate(result):
+            if not r.get('suspicious') and not r.get('is_ai'):
+                r['rank'] = i + 1
+        ai_entry['rank'] = next((i+1 for i, r in enumerate(result) if r.get('is_ai')), None)
 
     resp = jsonify({'leaderboard': result, 'me': me_entry})
     resp.headers['Access-Control-Allow-Origin'] = '*'
