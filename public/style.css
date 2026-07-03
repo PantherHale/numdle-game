@@ -556,7 +556,7 @@ body {
 .lb-page-hdr {
   position: sticky; top: 0; z-index: 10;
   background: #fff; border-bottom: 1px solid var(--border);
-  display: flex; align-items: center; justify-content: space-between;
+  display: flex; align-items: center; justify-content: flex-start; gap: 12px;
   padding: 0 16px; height: 56px; box-shadow: 0 1px 4px rgba(0,0,0,.06);
 }
 .lb-page-hdr h2 {
@@ -566,6 +566,8 @@ body {
   display: flex; align-items: center; gap: 5px;
   background: none; border: none; color: var(--accent); font-size: .85rem;
   font-weight: 700; cursor: pointer; padding: 6px 0;
+  border-right: 1.5px solid var(--border); padding-right: 14px; margin-right: 2px;
+  white-space: nowrap; flex-shrink: 0;
 }
 .lb-back-btn:hover { opacity: .75; }
 
