@@ -806,7 +806,6 @@ function renderLeaderboardPage(data) {
     document.getElementById('my-rank').textContent        = me.rank ?? '—';
     document.getElementById('my-display-name').textContent= me.username;
     document.getElementById('my-win-rate').textContent    = (me.win_rate ?? 0) + '%';
-    document.getElementById('my-optimal').textContent     = me.optimal_rate != null ? me.optimal_rate + '%' : '—';
     document.getElementById('my-streak').textContent      = me.streak ?? 0;
     document.getElementById('my-games').textContent       = me.total_games ?? 0;
     const sn = me.streak || 0;
@@ -831,7 +830,6 @@ function renderLeaderboardPage(data) {
       <span class="lb-row-rank ${rCls}">${r.rank ?? '—'}</span>
       <span class="lb-row-name">${nameStr}</span>
       <span class="lb-row-rate">${r.win_rate ?? 0}%</span>
-      <span class="lb-row-opt">${r.optimal_rate != null ? r.optimal_rate + '%' : '—'}</span>
       <span class="lb-row-games">${r.total_games ?? 0}</span>
     </div>`;
   }).join('');
@@ -932,7 +930,7 @@ function ask(question) {
   renderCandidateGrid(entry);
 
   if (gs.asked.length>=MAX_Q) {
-    showToast('All 6 questions used — now submit your guess!');
+    showToast('All 7 questions used — now submit your guess!');
   }
 }
 

@@ -1,18 +1,1 @@
-{
-  "total_games": 5,
-  "human_wins": 2,
-  "ai_wins": 3,
-  "ties": 0,
-  "human_win_rate": 0.4,
-  "ai_win_rate": 0.6,
-  "avg_human_distance": 33.8,
-  "avg_ai_distance": 20.0,
-  "daily": {
-    "2026-06-30": {
-      "games": 5,
-      "human_wins": 2,
-      "ai_wins": 3,
-      "ties": 0
-    }
-  }
-}
+﻿{"total_games":0,"human_wins":0,"ai_wins":0,"ties":0,"human_win_rate":0.0,"ai_win_rate":0.0,"avg_human_distance":0.0,"avg_ai_distance":0.0,"daily":{}}

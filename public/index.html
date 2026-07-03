@@ -70,10 +70,6 @@
         <small>Win Rate</small>
       </div>
       <div class="lb-my-stat">
-        <span class="lb-my-val" id="my-optimal">—</span>
-        <small>Optimal</small>
-      </div>
-      <div class="lb-my-stat">
         <span class="lb-my-val" id="my-streak">—</span>
         <small>Streak</small>
       </div>
@@ -98,17 +94,11 @@
 
   <!-- All-time rankings -->
   <div class="lb-section">
-    <div class="lb-section-hdr">
-      All-Time Rankings
-      <span class="lb-opt-tooltip" title="Optimal = win rate if you guessed the median of remaining candidates — measures question strategy quality">
-        Optimal ?
-      </span>
-    </div>
+    <div class="lb-section-hdr">All-Time Rankings</div>
     <div class="lb-rankings-hdr">
       <span>#</span>
       <span>Player</span>
       <span>Win%</span>
-      <span>Opt%</span>
       <span>Games</span>
     </div>
     <div id="lb-rankings">
@@ -138,7 +128,7 @@
     <!-- ── Active game elements (hidden after game over) ── -->
     <div id="active-game-area">
       <div class="meta-row">
-        <div class="status-pill"><span id="qs-used">0</span> / 6 questions</div>
+        <div class="status-pill"><span id="qs-used">0</span> / 7 questions</div>
         <div class="status-pill cand-pill"><span id="cands-left">1000</span> candidates left</div>
       </div>
       <div class="candidate-section" id="candidate-section">
@@ -204,7 +194,7 @@
     <div class="modal-body">
       <p>Guess a secret number between <strong>1 and 1000</strong>.</p>
       <ul>
-        <li>Ask up to <strong>6 questions</strong> from the MCQ picker.</li>
+        <li>Ask up to <strong>7 questions</strong> from the MCQ picker.</li>
         <li>Or fill in your own numbers in the custom blanks.</li>
         <li>Then submit your best guess.</li>
         <li>The <strong>AI</strong> also guesses — whoever is closer wins.</li>
