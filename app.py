@@ -4,10 +4,19 @@ app.py — Numdle server with auth, leaderboard, and stats tracking.
 import json, os, sqlite3, hashlib, secrets
 from datetime import date, timedelta, datetime
 from flask import Flask, send_from_directory, jsonify, request, abort
-from flask_cors import CORS
 
-app     = Flask(__name__)
-CORS(app)
+app = Flask(__name__)
+
+@app.after_request
+def add_cors(response):
+    response.headers['Access-Control-Allow-Origin']  = '*'
+    response.headers['Access-Control-Allow-Headers'] = 'Content-Type, X-Auth-Token'
+    response.headers['Access-Control-Allow-Methods'] = 'GET, POST, OPTIONS'
+    return response
+
+@app.route('/api/<path:path>', methods=['OPTIONS'])
+def options_handler(path):
+    return '', 204
 PUBLIC  = os.path.join(os.path.dirname(__file__), 'public')
 LOG_DIR      = os.path.join(os.path.dirname(__file__), 'logs')
 WINS_DIR     = os.path.join(LOG_DIR, 'player_wins')
