@@ -843,10 +843,13 @@ function renderLeaderboardPage(data) {
   const rows = list.filter(r => !r.suspicious).map(r => {
     const rCls = r.rank===1?'lb-rank-1':r.rank===2?'lb-rank-2':r.rank===3?'lb-rank-3':'';
     const nameStr = escHtml(r.username) + (r.is_ai ? ' 🤖' : r.is_me ? ' ← you' : '');
+    const rateStr = r.is_ai
+      ? `~${r.avg_distance ?? '?'} off`
+      : `${r.win_rate ?? 0}%`;
     return `<div class="lb-row${r.is_me?' lb-row-me':''}${r.is_ai?' lb-row-ai':''}">
       <span class="lb-row-rank ${rCls}">${r.rank ?? '—'}</span>
       <span class="lb-row-name">${nameStr}</span>
-      <span class="lb-row-rate">${r.win_rate ?? 0}%</span>
+      <span class="lb-row-rate">${rateStr}</span>
       <span class="lb-row-games">${r.total_games ?? 0}</span>
     </div>`;
   }).join('');

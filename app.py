@@ -269,24 +269,35 @@ def leaderboard():
             ORDER BY wins * 1.0 / total_games DESC, total_games DESC
         ''').fetchall()
 
-    # AI entry — always shown, stats from success_stats.json
-    stats_path = os.path.join(LOG_DIR, 'success_stats.json')
-    ai_wins = hum_wins = ties = n = 0
-    if os.path.exists(stats_path):
-        with open(stats_path, encoding='utf-8-sig') as f:
-            s = json.load(f)
-        daily    = s.get('daily', {})
-        n        = len(daily)
-        ai_wins  = sum(1 for d in daily.values() if d.get('ai_wins', 0) > 0)
-        hum_wins = sum(1 for d in daily.values() if d.get('human_wins', 0) > 0)
-        ties     = sum(1 for d in daily.values() if d.get('ties', 0) > 0)
+    # AI entry — stats from daily_data.json (one game per day, independent of users)
+    data_path = os.path.join(PUBLIC, 'daily_data.json')
+    ai_n = ai_exact = 0
+    ai_total_dist = 0
+    today_iso = date.today().isoformat()
+    if os.path.exists(data_path):
+        with open(data_path, encoding='utf-8') as f:
+            daily_data = json.load(f)
+        for iso, v in daily_data.items():
+            if iso.startswith('__') or not isinstance(v, dict) or 'ad' not in v:
+                continue
+            if iso > today_iso:
+                continue  # don't count future days
+            ai_n += 1
+            d = v.get('ad', 0)
+            ai_total_dist += d
+            if d == 0:
+                ai_exact += 1
+    ai_avg_dist = round(ai_total_dist / ai_n, 1) if ai_n else 0
     ai_entry = {
         'id': None, 'username': 'AI Bot', 'is_ai': True,
-        'total_games': n,
-        'wins': ai_wins, 'losses': hum_wins, 'ties': ties,
-        'win_rate': round(100.0 * ai_wins / n, 1) if n else 0,
-        'optimal_rate': 100,
-        'streak': n, 'avg_questions': 7, 'rank': None,
+        'total_games': ai_n,
+        'wins': ai_exact,
+        'losses': ai_n - ai_exact,
+        'ties': 0,
+        'win_rate': round(100.0 * ai_exact / ai_n, 1) if ai_n else 0,
+        'avg_distance': ai_avg_dist,
+        'optimal_rate': None,
+        'streak': 0, 'avg_questions': 7, 'rank': None,
     }
 
     result   = []
