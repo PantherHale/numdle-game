@@ -7,11 +7,7 @@ from flask import Flask, send_from_directory, jsonify, request, abort
 from flask_cors import CORS
 
 app     = Flask(__name__)
-CORS(app, origins=[
-    'https://numdle-game.pages.dev',
-    'http://localhost:5050',
-    'http://127.0.0.1:5050',
-])
+CORS(app)
 PUBLIC  = os.path.join(os.path.dirname(__file__), 'public')
 LOG_DIR      = os.path.join(os.path.dirname(__file__), 'logs')
 WINS_DIR     = os.path.join(LOG_DIR, 'player_wins')
