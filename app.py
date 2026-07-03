@@ -261,20 +261,20 @@ def leaderboard():
         rows = db.execute('''
             SELECT u.id, u.username,
                    COUNT(g.id) AS total_games,
-                   SUM(CASE WHEN g.outcome='human_wins' THEN 1 ELSE 0 END) AS wins,
-                   SUM(CASE WHEN g.outcome='ai_wins'    THEN 1 ELSE 0 END) AS losses,
-                   SUM(CASE WHEN g.outcome='tie'        THEN 1 ELSE 0 END) AS ties,
+                   SUM(CASE WHEN g.human_distance <= 5 THEN 1 ELSE 0 END) AS wins,
+                   SUM(CASE WHEN g.human_distance > 5  THEN 1 ELSE 0 END) AS losses,
+                   0 AS ties,
                    ROUND(AVG(g.human_distance), 0) AS avg_human_distance
             FROM users u
             JOIN game_records g ON u.id=g.user_id
             GROUP BY u.id
             HAVING total_games >= 1
-            ORDER BY wins * 1.0 / total_games DESC, total_games DESC
+            ORDER BY wins DESC, avg_human_distance ASC
         ''').fetchall()
 
     # AI entry — stats from logs/ai_game_log.json (written by precompute.py, one entry per day)
     ai_log_path = os.path.join(LOG_DIR, 'ai_game_log.json')
-    ai_n = ai_exact = ai_total_dist = 0
+    ai_n = ai_wins = ai_total_dist = 0
     today_iso = date.today().isoformat()
     if os.path.exists(ai_log_path):
         with open(ai_log_path, encoding='utf-8-sig') as f:
@@ -285,14 +285,14 @@ def leaderboard():
             ai_n += 1
             d = v.get('ai_distance', 0)
             ai_total_dist += d
-            if d == 0:
-                ai_exact += 1
+            if d <= 5:
+                ai_wins += 1
     ai_avg_dist = round(ai_total_dist / ai_n, 1) if ai_n else 0
     ai_entry = {
         'id': None, 'username': 'AI Bot', 'is_ai': True,
         'total_games': ai_n,
-        'wins': ai_exact,
-        'losses': ai_n - ai_exact,
+        'wins': ai_wins,
+        'losses': ai_n - ai_wins,
         'ties': 0,
         'win_rate': round(100.0 * ai_exact / ai_n, 1) if ai_n else 0,
         'avg_distance': ai_avg_dist,
@@ -301,24 +301,17 @@ def leaderboard():
     }
 
     result   = []
-    vis_rank = 1
     me_entry = None
 
     for row in rows:
         r = dict(row)
-        r['win_rate']     = round(100.0 * r['wins'] / r['total_games'], 1) if r['total_games'] else 0
         r['win_rate']     = round(100.0 * r['wins'] / r['total_games'], 1) if r['total_games'] else 0
         r['avg_distance'] = r.get('avg_human_distance')
         r['streak']       = calculate_streak(r['id'])
         r['suspicious']   = is_suspicious(r['id'])
         r['is_me']        = bool(me_user and me_user['id'] == r['id'])
         r['is_ai']        = False
-
-        if r['suspicious']:
-            r['rank'] = None
-        else:
-            r['rank'] = vis_rank
-            vis_rank += 1
+        r['rank']         = None
 
         result.append(r)
         if r['is_me']:
@@ -333,14 +326,17 @@ def leaderboard():
             'rank': None, 'is_me': True, 'is_ai': False, 'suspicious': False,
         }
 
-    # Insert AI entry at correct rank
+    # Merge AI entry, sort everyone together, assign sequential ranks
     if ai_entry:
         result.append(ai_entry)
-        result.sort(key=lambda x: (-(x.get('wins') or 0), (x.get('avg_distance') or 9999)))
-        for i, r in enumerate(result):
-            if not r.get('suspicious') and not r.get('is_ai'):
-                r['rank'] = i + 1
-        ai_entry['rank'] = next((i+1 for i, r in enumerate(result) if r.get('is_ai')), None)
+    result.sort(key=lambda x: (-(x.get('wins') or 0), (x.get('avg_distance') if x.get('avg_distance') is not None else 9999)))
+    rank_counter = 1
+    for r in result:
+        if r.get('suspicious'):
+            r['rank'] = None
+        else:
+            r['rank'] = rank_counter
+            rank_counter += 1
 
     resp = jsonify({'leaderboard': result, 'me': me_entry})
     resp.headers['Access-Control-Allow-Origin'] = '*'

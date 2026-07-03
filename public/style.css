@@ -837,3 +837,9 @@ body {
   text-decoration: underline;
   text-underline-offset: 2px;
 }
+
+.footer-copy {
+  margin-top: 6px;
+  font-size: .68rem;
+  color: var(--muted, #aaa);
+}
