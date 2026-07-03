@@ -235,7 +235,7 @@ def leaderboard():
     stats_path = os.path.join(LOG_DIR, 'success_stats.json')
     ai_entry   = None
     if os.path.exists(stats_path):
-        with open(stats_path) as f:
+        with open(stats_path, encoding='utf-8-sig') as f:
             s = json.load(f)
         # Count per-day stats so AI shows one game per day, not one per game log
         daily = s.get('daily', {})
@@ -298,7 +298,7 @@ def update_success_stats(outcome, human_dist, ai_dist):
     today = date.today().isoformat()
 
     if os.path.exists(path):
-        with open(path) as f:
+        with open(path, encoding='utf-8-sig') as f:
             s = json.load(f)
     else:
         s = {
@@ -456,7 +456,7 @@ def admin_stats():
     path = os.path.join(LOG_DIR, 'success_stats.json')
     if not os.path.exists(path):
         return jsonify({'message': 'No stats logged yet'})
-    with open(path) as f:
+    with open(path, encoding='utf-8-sig') as f:
         return jsonify(json.load(f))
 
 
