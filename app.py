@@ -80,8 +80,10 @@ def make_token(user_id):
                    (token, user_id, expires))
     return token
 
-def auth_user(token):
+def auth_user(token=None):
     """Validate token, refresh its expiry, return user dict or None."""
+    if not token:
+        token = request.headers.get('X-Auth-Token') or request.args.get('token')
     if not token:
         return None
     now = datetime.utcnow().isoformat()
@@ -127,7 +129,7 @@ def serve_static(path):
 
 @app.route('/api/signup', methods=['POST'])
 def signup():
-    d        = request.get_json(silent=True) or {}
+    d        = request.get_json(force=True, silent=True) or {}
     username = (d.get('username') or '').strip()
     password = (d.get('password') or '').strip()
 
@@ -156,7 +158,7 @@ def signup():
 
 @app.route('/api/login', methods=['POST'])
 def login():
-    d        = request.get_json(silent=True) or {}
+    d        = request.get_json(force=True, silent=True) or {}
     username = (d.get('username') or '').strip()
     password = (d.get('password') or '').strip()
 
@@ -178,7 +180,7 @@ def login():
 
 @app.route('/api/me')
 def me_route():
-    user = auth_user(request.headers.get('X-Auth-Token'))
+    user = auth_user()
     if not user:
         return jsonify({'logged_in': False})
     return jsonify({'logged_in': True, **user})
@@ -186,7 +188,8 @@ def me_route():
 
 @app.route('/api/logout', methods=['POST'])
 def logout():
-    token = request.headers.get('X-Auth-Token')
+    d     = request.get_json(force=True, silent=True) or {}
+    token = request.headers.get('X-Auth-Token') or request.args.get('token') or d.get('token')
     if token:
         with get_db() as db:
             db.execute('DELETE FROM sessions WHERE token=?', (token,))
@@ -220,7 +223,7 @@ def calculate_streak(user_id):
 
 @app.route('/api/leaderboard')
 def leaderboard():
-    me_user = auth_user(request.headers.get('X-Auth-Token'))
+    me_user = auth_user()
 
     with get_db() as db:
         rows = db.execute('''
@@ -339,11 +342,11 @@ def update_success_stats(outcome, human_dist, ai_dist):
 
 @app.route('/log_game', methods=['POST'])
 def log_game():
-    data = request.get_json(silent=True)
+    data = request.get_json(force=True, silent=True)
     if not data or 'date' not in data:
         return jsonify({'error': 'invalid payload'}), 400
 
-    user = auth_user(request.headers.get('X-Auth-Token'))
+    user = auth_user()
     week = data.get('week') or week_start_of(data['date'])
     path = os.path.join(LOG_DIR, f'week_{week}.json')
 
@@ -574,7 +577,7 @@ def export_logs():
 def dev_reset_today():
     """Dev-only: wipe today's DB game record and return JS to clear localStorage."""
     today = date.today().isoformat()
-    user  = auth_user(request.headers.get('X-Auth-Token') or request.cookies.get('auth'))
+    user  = auth_user()
     deleted = 0
     if user:
         with get_db() as db:

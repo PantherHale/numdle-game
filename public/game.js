@@ -359,8 +359,11 @@ function saveGameLog(humanGuess, humanDist, aiDist, outcome, optimalDist) {
 }
 
 async function postGameToServer(entry) {
-  try { await fetch(`${API_BASE}/log_game`,{method:'POST',headers:apiHeaders(),body:JSON.stringify(entry)}); }
-  catch(_) {}
+  try {
+    const token = getAuth()?.token;
+    const url = `${API_BASE}/log_game${token ? '?token=' + encodeURIComponent(token) : ''}`;
+    await fetch(url, {method:'POST', headers:{'Content-Type':'text/plain'}, body:JSON.stringify(entry)});
+  } catch(_) {}
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -841,7 +844,9 @@ async function showLeaderboardPage() {
   document.getElementById('lb-page').style.display = 'flex';
   document.getElementById('lb-rankings').innerHTML = '<p class="muted" style="text-align:center;padding:16px">Loading…</p>';
   try {
-    const res  = await fetch(`${API_BASE}/api/leaderboard`, {headers: apiHeaders()});
+    const token = getAuth()?.token;
+    const lbUrl = `${API_BASE}/api/leaderboard${token ? '?token=' + encodeURIComponent(token) : ''}`;
+    const res  = await fetch(lbUrl);
     const data = await res.json();
     renderLeaderboardPage(data);
   } catch(_) {
@@ -875,7 +880,7 @@ async function handleAuth() {
   errEl.textContent='Saving...';
   try {
     const res=await fetch(authMode==='signup'?`${API_BASE}/api/signup`:`${API_BASE}/api/login`,
-      {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username,password})});
+      {method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({username,password})});
     const d=await res.json();
     if (!res.ok){errEl.textContent=d.error||'Something went wrong.';return;}
     errEl.textContent='';
@@ -887,7 +892,10 @@ async function handleAuth() {
 }
 
 async function handleLogout() {
-  try{await fetch(`${API_BASE}/api/logout`,{method:'POST',headers:apiHeaders()});}catch(_){}
+  try{
+    const token = getAuth()?.token || '';
+    await fetch(`${API_BASE}/api/logout`,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({token})});
+  }catch(_){}
   clearAuth(); updateAuthUI(); showToast('Logged out.');
 }
 
