@@ -1,8 +1,0 @@
-=======================================================
-  Numdle  ->  http://localhost:5050
-  Logs    ->  C:\Users\gaura\Documents\researchmodel1\gameapp\logs
-  Admin   ->  http://localhost:5050/admin/logs
-  Charts  ->  http://localhost:5050/admin/charts
-=======================================================
- * Serving Flask app 'app'
- * Debug mode: off

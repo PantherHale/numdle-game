@@ -1,0 +1,5 @@
+numdle.db
+*.log
+__pycache__/
+*.pyc
+logs/player_wins/
