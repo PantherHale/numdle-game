@@ -294,7 +294,7 @@ def leaderboard():
         'wins': ai_wins,
         'losses': ai_n - ai_wins,
         'ties': 0,
-        'win_rate': round(100.0 * ai_exact / ai_n, 1) if ai_n else 0,
+        'win_rate': round(100.0 * ai_wins / ai_n, 1) if ai_n else 0,
         'avg_distance': ai_avg_dist,
         'optimal_rate': None,
         'streak': 0, 'avg_questions': 7, 'rank': None,
