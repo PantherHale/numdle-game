@@ -297,7 +297,9 @@ def leaderboard():
         result.append(ai_entry)
         result.sort(key=lambda x: (-(x['win_rate'] or 0), -(x.get('total_games') or 0)))
 
-    return jsonify({'leaderboard': result, 'me': me_entry})
+    resp = jsonify({'leaderboard': result, 'me': me_entry})
+    resp.headers['Access-Control-Allow-Origin'] = '*'
+    return resp
 
 # ── Game log + stats ───────────────────────────────────────────────────────────
 
