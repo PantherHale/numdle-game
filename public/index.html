@@ -236,7 +236,16 @@
       </div>
       <div id="auth-loggedin" style="display:none">
         <p class="auth-welcome">Signed in as <strong id="auth-username-display"></strong></p>
-        <button class="btn-secondary" id="auth-logout">Log out</button>
+        <div id="chpw-section" style="margin-top:14px">
+          <button class="btn-link" id="chpw-toggle">Change password</button>
+          <div id="chpw-form" style="display:none;margin-top:10px;display:none">
+            <input type="password" id="chpw-old" class="text-input" placeholder="Current password" style="margin-bottom:8px">
+            <input type="password" id="chpw-new" class="text-input" placeholder="New password (min 4 chars)">
+            <p class="auth-error" id="chpw-error" style="margin-top:6px"></p>
+            <button class="btn-ask" id="chpw-submit" style="margin-top:8px;width:100%">Update Password</button>
+          </div>
+        </div>
+        <button class="btn-secondary" id="auth-logout" style="margin-top:12px">Log out</button>
       </div>
     </div>
   </div>

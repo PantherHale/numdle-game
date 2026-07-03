@@ -196,6 +196,31 @@ def logout():
             db.execute('DELETE FROM sessions WHERE token=?', (token,))
     return jsonify({'ok': True})
 
+
+@app.route('/api/change-password', methods=['POST'])
+def change_password():
+    user = auth_user()
+    if not user:
+        resp = jsonify({'error': 'Not logged in'}); resp.headers['Access-Control-Allow-Origin']='*'; return resp, 401
+    d        = request.get_json(force=True, silent=True) or {}
+    old_pw   = (d.get('old_password') or '').strip()
+    new_pw   = (d.get('new_password') or '').strip()
+    if not old_pw or not new_pw:
+        resp = jsonify({'error': 'Fill in both fields'}); resp.headers['Access-Control-Allow-Origin']='*'; return resp, 400
+    if len(new_pw) < 4:
+        resp = jsonify({'error': 'New password must be at least 4 characters'}); resp.headers['Access-Control-Allow-Origin']='*'; return resp, 400
+    with get_db() as db:
+        row = db.execute('SELECT id FROM users WHERE id=? AND password_hash=?',
+                         (user['id'], hash_pw(old_pw))).fetchone()
+    if not row:
+        resp = jsonify({'error': 'Current password is incorrect'}); resp.headers['Access-Control-Allow-Origin']='*'; return resp, 401
+    with get_db() as db:
+        db.execute('UPDATE users SET password_hash=? WHERE id=?', (hash_pw(new_pw), user['id']))
+    resp = jsonify({'ok': True})
+    resp.headers['Access-Control-Allow-Origin'] = '*'
+    return resp
+
+
 # ── Leaderboard ────────────────────────────────────────────────────────────────
 
 def calculate_streak(user_id):
@@ -288,6 +313,16 @@ def leaderboard():
         result.append(r)
         if r['is_me']:
             me_entry = r
+
+    # If logged in but no game records yet, still return me info
+    if me_user and not me_entry:
+        me_entry = {
+            'id': me_user['id'], 'username': me_user['username'],
+            'total_games': 0, 'wins': 0, 'losses': 0, 'ties': 0,
+            'win_rate': 0.0, 'optimal_rate': None, 'streak': 0,
+            'avg_questions': None, 'rank': None,
+            'is_me': True, 'is_ai': False, 'suspicious': False,
+        }
 
     # Insert AI entry at correct rank
     if ai_entry:

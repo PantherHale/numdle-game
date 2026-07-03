@@ -816,8 +816,22 @@ function renderLeaderboardPage(data) {
     if (myCard) myCard.style.display = 'block';
     if (signCard) signCard.style.display = 'none';
   } else {
-    if (myCard) myCard.style.display = 'none';
-    if (signCard) signCard.style.display = 'flex';
+    const localAuth = getAuth();
+    if (localAuth) {
+      // Logged in locally but no game records yet — hide signup card
+      if (myCard) myCard.style.display = 'none';
+      if (signCard) signCard.style.display = 'none';
+      document.getElementById('my-display-name').textContent = localAuth.username;
+      document.getElementById('my-rank').textContent = '—';
+      document.getElementById('my-win-rate').textContent = '0%';
+      document.getElementById('my-streak').textContent = '0';
+      document.getElementById('my-games').textContent = '0';
+      document.getElementById('my-streak-label').textContent = 'No games yet';
+      if (myCard) myCard.style.display = 'block';
+    } else {
+      if (myCard) myCard.style.display = 'none';
+      if (signCard) signCard.style.display = 'flex';
+    }
   }
 
   const rankingsEl = document.getElementById('lb-rankings');
@@ -889,6 +903,26 @@ async function handleAuth() {
     document.getElementById('auth-password').value='';
     showToast(`Welcome, ${d.username}!`);
   } catch(_){errEl.textContent='Network error.';}
+}
+
+async function handleChangePassword() {
+  const oldPw  = (document.getElementById('chpw-old')?.value  || '').trim();
+  const newPw  = (document.getElementById('chpw-new')?.value  || '').trim();
+  const errEl  = document.getElementById('chpw-error');
+  if (!oldPw || !newPw) { errEl.textContent = 'Fill in both fields.'; return; }
+  errEl.textContent = 'Saving...';
+  try {
+    const token = getAuth()?.token || '';
+    const res = await fetch(`${API_BASE}/api/change-password?token=${encodeURIComponent(token)}`,
+      {method:'POST', headers:{'Content-Type':'text/plain'}, body:JSON.stringify({old_password:oldPw, new_password:newPw})});
+    const d = await res.json();
+    if (!res.ok) { errEl.textContent = d.error || 'Something went wrong.'; return; }
+    errEl.textContent = '';
+    document.getElementById('chpw-old').value = '';
+    document.getElementById('chpw-new').value = '';
+    document.getElementById('chpw-form').style.display = 'none';
+    showToast('Password updated!');
+  } catch(_) { errEl.textContent = 'Network error.'; }
 }
 
 async function handleLogout() {
@@ -1111,6 +1145,12 @@ async function init() {
   document.getElementById('auth-submit').addEventListener('click',handleAuth);
   document.getElementById('auth-toggle').addEventListener('click',()=>setAuthMode(authMode==='signup'?'login':'signup'));
   document.getElementById('auth-logout').addEventListener('click',handleLogout);
+  document.getElementById('chpw-toggle')?.addEventListener('click',()=>{
+    const f = document.getElementById('chpw-form');
+    f.style.display = f.style.display === 'none' ? 'flex' : 'none';
+    f.style.flexDirection = 'column';
+  });
+  document.getElementById('chpw-submit')?.addEventListener('click', handleChangePassword);
   document.getElementById('auth-username')?.addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('auth-password').focus();});
   document.getElementById('auth-password')?.addEventListener('keydown',e=>{if(e.key==='Enter')handleAuth();});
 
