@@ -1,0 +1,383 @@
+{
+  "week_start": "2026-06-29",
+  "week_end": "2026-07-05",
+  "games": [
+    {
+      "game_id": "2026-06-30-mr0b9vmz",
+      "date": "2026-06-30",
+      "week": "2026-06-29",
+      "secret": 767,
+      "questions_asked": 2,
+      "questions": [
+        {
+          "text": "Is the sum of digits of the number greater than 15",
+          "parsed": {
+            "type": "range",
+            "low": 16,
+            "high": 1000
+          },
+          "answer": "yes",
+          "vocab_action": 8,
+          "type": "range",
+          "is_new_type": false
+        },
+        {
+          "text": "What mod 5",
+          "parsed": {
+            "type": "modular",
+            "divisor": 5
+          },
+          "answer": "2",
+          "vocab_action": 60,
+          "type": "modular",
+          "is_new_type": false
+        }
+      ],
+      "human_guess": 767,
+      "human_distance": 0,
+      "ai_guess": 747,
+      "ai_distance": 20,
+      "outcome": "human_wins",
+      "played_at": "2026-06-30T07:14:29.867Z"
+    },
+    {
+      "game_id": "2026-06-30-mr0brssr",
+      "date": "2026-06-30",
+      "week": "2026-06-29",
+      "secret": 767,
+      "questions_asked": 3,
+      "questions": [
+        {
+          "text": "Is the sum of digit of numbers greater than 1]5",
+          "parsed": {
+            "type": "digit_sum",
+            "threshold": 1
+          },
+          "answer": "yes",
+          "vocab_action": -1,
+          "type": "digit_sum",
+          "is_new_type": true
+        },
+        {
+          "text": "Is the sum of digits of number greater than 23",
+          "parsed": {
+            "type": "digit_sum",
+            "threshold": 23
+          },
+          "answer": "no",
+          "vocab_action": -1,
+          "type": "digit_sum",
+          "is_new_type": true
+        },
+        {
+          "text": "Mod 5",
+          "parsed": {
+            "type": "modular",
+            "divisor": 5
+          },
+          "answer": "2",
+          "vocab_action": 60,
+          "type": "modular",
+          "is_new_type": false
+        }
+      ],
+      "human_guess": 767,
+      "human_distance": 0,
+      "ai_guess": 747,
+      "ai_distance": 20,
+      "outcome": "human_wins",
+      "played_at": "2026-06-30T07:28:25.995Z"
+    },
+    {
+      "game_id": "kcm81dq93r",
+      "date": "2026-06-30",
+      "week": "2026-06-29",
+      "secret": 767,
+      "questions_asked": 4,
+      "questions": [
+        {
+          "text": "Is the number between 1 and 700?",
+          "answer": "no",
+          "type": "range",
+          "vocab_action": 6,
+          "is_new_type": false
+        },
+        {
+          "text": "Is the number between 1 and 100?",
+          "answer": "no",
+          "type": "range",
+          "vocab_action": 0,
+          "is_new_type": false
+        },
+        {
+          "text": "Is the number prime?",
+          "answer": "no",
+          "type": "special",
+          "vocab_action": 67,
+          "is_new_type": false
+        },
+        {
+          "text": "Is the hundreds digit greater than the units digit?",
+          "answer": "no",
+          "type": "digit_compare",
+          "vocab_action": 74,
+          "is_new_type": false
+        }
+      ],
+      "human_guess": 767,
+      "human_distance": 0,
+      "ai_guess": 747,
+      "ai_distance": 20,
+      "outcome": "human_wins",
+      "has_unique_questions": false,
+      "played_at": "2026-06-30T10:32:11.830Z"
+    },
+    {
+      "game_id": "mbwl5876kd",
+      "date": "2026-06-30",
+      "week": "2026-06-29",
+      "secret": 767,
+      "questions_asked": 7,
+      "questions": [
+        {
+          "text": "Is the number between 500 and 800?",
+          "answer": "yes",
+          "type": "range",
+          "vocab_action": -1,
+          "is_new_type": true
+        },
+        {
+          "text": "Is the number between 600 and 700?",
+          "answer": "no",
+          "type": "range",
+          "vocab_action": -1,
+          "is_new_type": true
+        },
+        {
+          "text": "What is the number modulo 6?",
+          "answer": "5",
+          "type": "modular",
+          "vocab_action": 61,
+          "is_new_type": false
+        },
+        {
+          "text": "What is the number modulo 8?",
+          "answer": "7",
+          "type": "modular",
+          "vocab_action": 63,
+          "is_new_type": false
+        },
+        {
+          "text": "Is the digit sum greater than 5?",
+          "answer": "yes",
+          "type": "digit_sum",
+          "vocab_action": 67,
+          "is_new_type": false
+        },
+        {
+          "text": "Is the digit sum greater than 16?",
+          "answer": "yes",
+          "type": "digit_sum",
+          "vocab_action": -1,
+          "is_new_type": true
+        },
+        {
+          "text": "Is the units digit greater than the tens digit?",
+          "answer": "yes",
+          "type": "digit_compare",
+          "vocab_action": 93,
+          "is_new_type": false
+        }
+      ],
+      "human_guess": 719,
+      "human_distance": 48,
+      "ai_guess": 747,
+      "ai_distance": 20,
+      "optimal_distance": 24,
+      "outcome": "ai_wins",
+      "has_unique_questions": true,
+      "played_at": "2026-06-30T11:43:44.871Z"
+    },
+    {
+      "game_id": "bsi8i0zzpe",
+      "date": "2026-06-30",
+      "week": "2026-06-29",
+      "secret": 767,
+      "questions_asked": 6,
+      "questions": [
+        {
+          "text": "Is the number between 500 and 1000?",
+          "answer": "yes",
+          "type": "range",
+          "vocab_action": -1,
+          "is_new_type": true
+        },
+        {
+          "text": "Is the number even or odd?",
+          "answer": "odd",
+          "type": "parity",
+          "vocab_action": 56,
+          "is_new_type": false
+        },
+        {
+          "text": "Is the number a perfect cube? (1,8,27,64\u2026)",
+          "answer": "no",
+          "type": "special",
+          "vocab_action": 76,
+          "is_new_type": false
+        },
+        {
+          "text": "Is the hundreds digit greater than the tens digit?",
+          "answer": "yes",
+          "type": "digit_compare",
+          "vocab_action": 102,
+          "is_new_type": false
+        },
+        {
+          "text": "Is the number divisible by 6?",
+          "answer": "no",
+          "type": "divisible",
+          "vocab_action": 107,
+          "is_new_type": false
+        },
+        {
+          "text": "Do the digits alternate between odd and even? (e.g. 123, 52)",
+          "answer": "yes",
+          "type": "special",
+          "vocab_action": 96,
+          "is_new_type": false
+        }
+      ],
+      "human_guess": 768,
+      "human_distance": 1,
+      "ai_guess": 747,
+      "ai_distance": 20,
+      "optimal_distance": 6,
+      "outcome": "human_wins",
+      "has_unique_questions": true,
+      "played_at": "2026-06-30T16:16:49.828Z"
+    },
+    {
+      "game_id": "r3y3wfwam5",
+      "date": "2026-06-30",
+      "week": "2026-06-29",
+      "secret": 767,
+      "questions_asked": 6,
+      "questions": [
+        {
+          "text": "Is the number between 500 and 900?",
+          "answer": "yes",
+          "type": "range",
+          "vocab_action": -1,
+          "is_new_type": true
+        },
+        {
+          "text": "What is the number modulo 6?",
+          "answer": "5",
+          "type": "modular",
+          "vocab_action": 61,
+          "is_new_type": false
+        },
+        {
+          "text": "What is the number modulo 5?",
+          "answer": "2",
+          "type": "modular",
+          "vocab_action": 60,
+          "is_new_type": false
+        },
+        {
+          "text": "Is the digit sum greater than 7?",
+          "answer": "yes",
+          "type": "digit_sum",
+          "vocab_action": 68,
+          "is_new_type": false
+        },
+        {
+          "text": "Is the digit sum greater than 3?",
+          "answer": "yes",
+          "type": "digit_sum",
+          "vocab_action": 66,
+          "is_new_type": false
+        },
+        {
+          "text": "Is the tens digit greater than the hundreds digit?",
+          "answer": "no",
+          "type": "digit_compare",
+          "vocab_action": 100,
+          "is_new_type": false
+        }
+      ],
+      "human_guess": 737,
+      "human_distance": 30,
+      "ai_guess": 747,
+      "ai_distance": 20,
+      "optimal_distance": 45,
+      "outcome": "ai_wins",
+      "has_unique_questions": true,
+      "played_at": "2026-06-30T16:35:35.318Z"
+    },
+    {
+      "game_id": "pas7w1j1iek",
+      "date": "2026-06-30",
+      "week": "2026-06-29",
+      "secret": 767,
+      "questions_asked": 6,
+      "questions": [
+        {
+          "text": "What is the number modulo 10?",
+          "answer": "7",
+          "type": "modular",
+          "vocab_action": 65,
+          "is_new_type": false
+        },
+        {
+          "text": "What is the number modulo 9?",
+          "answer": "2",
+          "type": "modular",
+          "vocab_action": 64,
+          "is_new_type": false
+        },
+        {
+          "text": "Is the digit sum greater than 7?",
+          "answer": "yes",
+          "type": "digit_sum",
+          "vocab_action": 67,
+          "is_new_type": false
+        },
+        {
+          "text": "Is the number divisible by 3?",
+          "answer": "no",
+          "type": "divisible",
+          "vocab_action": 103,
+          "is_new_type": false
+        },
+        {
+          "text": "Is the number divisible by 6?",
+          "answer": "no",
+          "type": "divisible",
+          "vocab_action": 106,
+          "is_new_type": false
+        },
+        {
+          "text": "Is the number a Fibonacci number?",
+          "answer": "no",
+          "type": "special",
+          "vocab_action": 78,
+          "is_new_type": false
+        }
+      ],
+      "human_guess": 677,
+      "human_distance": 90,
+      "ai_guess": 747,
+      "ai_distance": 20,
+      "optimal_distance": 270,
+      "outcome": "ai_wins",
+      "has_unique_questions": false,
+      "played_at": "2026-06-30T16:46:06.797Z"
+    }
+  ],
+  "total": 7,
+  "wins": 4,
+  "losses": 3,
+  "ties": 0
+}

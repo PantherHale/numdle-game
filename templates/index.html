@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Numdle – Beat the AI</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <header>
+    <div class="header-inner">
+      <h1>NUMDLE</h1>
+      <p class="subtitle">Beat the AI at guessing today's number (1–1000)</p>
+    </div>
+  </header>
+
+  <main>
+    <!-- Status bar -->
+    <div class="status-bar">
+      <div class="status-item">
+        <span class="label">Questions left</span>
+        <span class="value" id="questions-left">{{ questions_left }}</span>
+      </div>
+      <div class="status-item">
+        <span class="label">Today's date</span>
+        <span class="value" id="todays-date"></span>
+      </div>
+      <div class="status-item">
+        <span class="label">Resets at</span>
+        <span class="value">midnight</span>
+      </div>
+    </div>
+
+    <!-- Asked questions log -->
+    <section class="asked-log" id="asked-log">
+      <h2>Your Questions</h2>
+      <div id="qa-list">
+        {% for item in asked %}
+        <div class="qa-row">
+          <span class="qa-q">{{ item.question }}</span>
+          <span class="qa-a">{{ item.answer }}</span>
+        </div>
+        {% endfor %}
+        {% if not asked %}
+        <p class="hint">Ask up to {{ max_questions }} questions to narrow down the number, then make your guess.</p>
+        {% endif %}
+      </div>
+    </section>
+
+    <!-- Question picker (hidden when game over) -->
+    {% if not game_over %}
+    <section class="question-picker" id="question-picker">
+      <h2>Ask a Question</h2>
+      <div class="groups-container" id="groups-container">
+        {% for group in groups %}
+        <div class="group">
+          <button class="group-toggle" data-group="{{ loop.index0 }}">
+            {{ group.label }} <span class="arrow">▾</span>
+          </button>
+          <div class="group-questions" id="group-{{ loop.index0 }}" style="display:none">
+            {% for q in group.questions %}
+            <button class="q-btn" data-id="{{ q.id }}"
+              {% for item in asked %}{% if item.id == q.id %}disabled{% endif %}{% endfor %}>
+              {{ q.text }}
+            </button>
+            {% endfor %}
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </section>
+
+    <!-- Guess form -->
+    <section class="guess-section" id="guess-section">
+      <h2>Make Your Guess</h2>
+      <p class="guess-hint">Enter a number between 1 and 1000</p>
+      <div class="guess-row">
+        <input type="number" id="guess-input" min="1" max="1000" placeholder="Your guess…">
+        <button id="guess-btn" class="btn-primary">Submit Guess</button>
+      </div>
+      <p class="error-msg" id="error-msg"></p>
+    </section>
+    {% endif %}
+
+    <!-- Results panel (shown after guess or if game_over from session) -->
+    <section class="results" id="results" {% if not game_over %}style="display:none"{% endif %}>
+      <div class="reveal-box">
+        <span class="reveal-label">The number was</span>
+        <span class="reveal-number" id="reveal-number">{{ secret if game_over else '?' }}</span>
+      </div>
+
+      <div class="scoreboard">
+        <div class="score-card human {% if game_over %}{% if human_distance < ai_distance %}winner{% elif human_distance == ai_distance %}tie{% else %}loser{% endif %}{% endif %}" id="human-card">
+          <div class="score-who">You</div>
+          <div class="score-guess" id="human-guess-display">{{ human_guess if game_over else '—' }}</div>
+          <div class="score-distance">
+            {% if game_over %}
+            Off by <strong>{{ human_distance }}</strong>
+            {% else %}—{% endif %}
+          </div>
+          {% if game_over %}
+          <div class="score-badge">{% if human_distance < ai_distance %}🏆 Winner{% elif human_distance == ai_distance %}🤝 Tie{% else %}😔 Lost{% endif %}</div>
+          {% endif %}
+        </div>
+
+        <div class="vs-divider">VS</div>
+
+        <div class="score-card ai {% if game_over %}{% if ai_distance < human_distance %}winner{% elif ai_distance == human_distance %}tie{% else %}loser{% endif %}{% endif %}" id="ai-card">
+          <div class="score-who">AI</div>
+          <div class="score-guess" id="ai-guess-display">{{ ai_guess if game_over else '—' }}</div>
+          <div class="score-distance">
+            {% if game_over %}
+            Off by <strong>{{ ai_distance }}</strong>
+            {% else %}—{% endif %}
+          </div>
+          {% if game_over %}
+          <div class="score-badge">{% if ai_distance < human_distance %}🏆 Winner{% elif ai_distance == human_distance %}🤝 Tie{% else %}😔 Lost{% endif %}</div>
+          {% endif %}
+        </div>
+      </div>
+
+      {% if game_over %}
+      <div class="ai-walkthrough">
+        <h3>How the AI reasoned</h3>
+        <div class="qa-list-sm">
+          {% for item in ai_questions %}
+          <div class="qa-row-sm">
+            <span class="qa-q-sm">{{ item.question }}</span>
+            <span class="qa-a-sm">{{ item.answer }}</span>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+
+      <div class="tomorrow-note">
+        Come back tomorrow for a new number!
+      </div>
+      {% endif %}
+    </section>
+  </main>
+
+  <!-- Pass server data to JS -->
+  <script>
+    window.GAME_STATE = {
+      gameOver: {{ 'true' if game_over else 'false' }},
+      maxQuestions: {{ max_questions }},
+      questionsLeft: {{ questions_left }},
+      askedIds: [{% for item in asked %}{{ item.id }}{% if not loop.last %},{% endif %}{% endfor %}],
+    };
+  </script>
+  <script src="/static/game.js"></script>
+</body>
+</html>

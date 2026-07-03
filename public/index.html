@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Numdle</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- ── Header ── -->
+<header class="hdr">
+  <div class="hdr-side hdr-left">
+    <button class="icon-btn" id="help-btn" title="How to play">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+        <circle cx="12" cy="12" r="10"/><path d="M9.1 9a3 3 0 0 1 5.82 1c0 2-3 3-3 3"/>
+        <circle cx="12" cy="17" r=".5" fill="currentColor"/>
+      </svg>
+    </button>
+  </div>
+  <div class="hdr-center">
+    <h1>NUMDLE</h1>
+    <p class="hdr-sub">Beat the AI · 1–1000</p>
+  </div>
+  <div class="hdr-side hdr-right">
+    <button class="icon-btn" id="leaderboard-btn" title="Leaderboard">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M8 21h8M12 17v4"/>
+        <path d="M17 3H7l1 9a4 4 0 0 0 8 0l1-9z"/>
+        <path d="M17 3c1.5 0 3 .8 3 3.5S18.5 10 17 10"/>
+        <path d="M7 3C5.5 3 4 3.8 4 6.5S5.5 10 7 10"/>
+      </svg>
+    </button>
+    <button class="icon-btn" id="account-btn" title="Account">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+        <circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
+      </svg>
+    </button>
+  </div>
+</header>
+
+<!-- ── Toasts ── -->
+<div id="toast-rack"></div>
+
+<!-- ── Full-screen Leaderboard Page ── -->
+<div id="lb-page" style="display:none" aria-label="Leaderboard">
+  <div class="lb-page-hdr">
+    <button class="lb-back-btn" id="lb-back-btn">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" width="18" height="18">
+        <path d="M15 18l-6-6 6-6"/>
+      </svg>
+      Back
+    </button>
+    <h2>Leaderboard</h2>
+    <div style="width:72px"></div>
+  </div>
+
+  <!-- Personal rank card -->
+  <div id="lb-my-card" class="lb-my-card" style="display:none">
+    <div class="lb-my-top">
+      <div class="lb-my-rank">#<span id="my-rank">—</span></div>
+      <div>
+        <div class="lb-my-name" id="my-display-name">—</div>
+        <div class="lb-my-streak" id="my-streak-label"></div>
+      </div>
+    </div>
+    <div class="lb-my-stats">
+      <div class="lb-my-stat">
+        <span class="lb-my-val" id="my-win-rate">—</span>
+        <small>Win Rate</small>
+      </div>
+      <div class="lb-my-stat">
+        <span class="lb-my-val" id="my-optimal">—</span>
+        <small>Optimal</small>
+      </div>
+      <div class="lb-my-stat">
+        <span class="lb-my-val" id="my-streak">—</span>
+        <small>Streak</small>
+      </div>
+      <div class="lb-my-stat">
+        <span class="lb-my-val" id="my-games">—</span>
+        <small>Games</small>
+      </div>
+    </div>
+  </div>
+
+  <!-- Signup card (not logged in) -->
+  <div id="lb-signup-card" class="lb-signup-card" style="display:none">
+    <p>Sign up to track your rank and win rate</p>
+    <button class="btn-signup" id="lb-page-signup-btn">Create Free Account</button>
+  </div>
+
+  <!-- This week section -->
+  <div class="lb-section">
+    <div class="lb-section-hdr">This Week</div>
+    <div id="lb-week-grid" class="lb-week-grid"><!-- filled by JS --></div>
+  </div>
+
+  <!-- All-time rankings -->
+  <div class="lb-section">
+    <div class="lb-section-hdr">
+      All-Time Rankings
+      <span class="lb-opt-tooltip" title="Optimal = win rate if you guessed the median of remaining candidates — measures question strategy quality">
+        Optimal ?
+      </span>
+    </div>
+    <div class="lb-rankings-hdr">
+      <span>#</span>
+      <span>Player</span>
+      <span>Win%</span>
+      <span>Opt%</span>
+      <span>Games</span>
+    </div>
+    <div id="lb-rankings">
+      <p class="muted" style="padding:16px 0;text-align:center">Loading…</p>
+    </div>
+  </div>
+</div>
+
+<!-- ── Game ── -->
+<main id="app">
+
+  <div id="loading" class="loading-screen">
+    <div class="spinner"></div>
+    <p>Loading…</p>
+  </div>
+
+  <div id="error-screen" class="error-screen" style="display:none">
+    <p id="error-text"></p>
+    <p class="hint">Run <code>py -3.11 precompute.py --week</code> then restart the server.</p>
+  </div>
+
+  <div id="game" style="display:none">
+
+    <!-- Week strip (always visible) -->
+    <div class="week-strip" id="week-strip"><!-- filled by JS --></div>
+
+    <!-- ── Active game elements (hidden after game over) ── -->
+    <div id="active-game-area">
+      <div class="meta-row">
+        <div class="status-pill"><span id="qs-used">0</span> / 6 questions</div>
+        <div class="status-pill cand-pill"><span id="cands-left">1000</span> candidates left</div>
+      </div>
+      <div class="candidate-section" id="candidate-section">
+        <div id="candidate-grid" class="candidate-grid" style="--grid-side:32"></div>
+        <p id="grid-behavior" class="grid-behavior">Grid shows all 1000 candidates. Ask a question to eliminate numbers.</p>
+      </div>
+      <div class="board" id="board"><!-- filled by JS --></div>
+      <div class="input-block" id="guess-card">
+        <div class="input-row">
+          <input type="number" id="guess-input" class="text-input num-input" min="1" max="1000" placeholder="Your guess  (1–1000)">
+          <button class="btn-ask btn-submit" id="guess-btn">Submit</button>
+        </div>
+        <p class="form-error" id="form-error"></p>
+      </div>
+    </div>
+
+    <!-- ── Post-game week view (shown after game over) ── -->
+    <div id="week-view" style="display:none">
+      <div class="wv-header">
+        <div class="wv-title">This Week</div>
+        <div class="wv-date-range" id="wv-date-range"></div>
+      </div>
+      <div id="wv-days" class="wv-days"><!-- filled by JS --></div>
+      <div class="wv-stats">
+        <div class="wv-stat">
+          <span class="wv-val" id="wv-wins">0</span>
+          <small>Wins</small>
+        </div>
+        <div class="wv-stat">
+          <span class="wv-val" id="wv-losses">0</span>
+          <small>Losses</small>
+        </div>
+        <div class="wv-stat">
+          <span class="wv-val" id="wv-rate">0%</span>
+          <small>Win rate</small>
+        </div>
+        <div class="wv-stat">
+          <span class="wv-val" id="wv-streak">0</span>
+          <small>Streak 🔥</small>
+        </div>
+      </div>
+      <div class="wv-cta">
+        <button class="btn-banner-primary" id="wv-results-btn">View Result</button>
+        <button class="btn-banner-primary" id="wv-lb-btn" style="background:var(--green)">Leaderboard</button>
+        <button class="btn-signup" id="wv-signup-btn" style="display:none">Save Score</button>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<!-- ════════════════════════════════════════
+     MODALS
+═════════════════════════════════════════ -->
+
+<!-- Help -->
+<div id="help-modal" class="modal-back" hidden>
+  <div class="modal" role="dialog" aria-modal="true">
+    <div class="modal-hdr">
+      <h2>How to Play</h2>
+      <button class="modal-x" data-close="help-modal">✕</button>
+    </div>
+    <div class="modal-body">
+      <p>Guess a secret number between <strong>1 and 1000</strong>.</p>
+      <ul>
+        <li>Ask up to <strong>6 questions</strong> from the MCQ picker.</li>
+        <li>Or fill in your own numbers in the custom blanks.</li>
+        <li>Then submit your best guess.</li>
+        <li>The <strong>AI</strong> also guesses — whoever is closer wins.</li>
+        <li>A new number unlocks at midnight every day.</li>
+      </ul>
+      <div class="rule-row">
+        <div class="rule-tile yes">YES</div>
+        <p>The number satisfies this property.</p>
+      </div>
+      <div class="rule-row">
+        <div class="rule-tile no">NO</div>
+        <p>The number does not have that property.</p>
+      </div>
+      <div class="rule-row">
+        <div class="rule-tile num">3</div>
+        <p>The question returned a number (mod, proximity, etc.).</p>
+      </div>
+      <hr class="rule-sep">
+      <p class="hint">Sign up (optional) to appear on the leaderboard and track your win rate and streak.</p>
+    </div>
+  </div>
+</div>
+
+<!-- Auth (login / signup) -->
+<div id="auth-modal" class="modal-back" hidden>
+  <div class="modal" role="dialog" aria-modal="true">
+    <div class="modal-hdr">
+      <h2 id="auth-title">Create Account</h2>
+      <button class="modal-x" data-close="auth-modal">✕</button>
+    </div>
+    <div class="modal-body">
+      <p class="muted" id="auth-subtitle">Sign up to track your score on the leaderboard. Login stays active for one week.</p>
+      <div class="auth-form">
+        <input type="text" id="auth-username" class="text-input" placeholder="Username" autocomplete="username" maxlength="20">
+        <input type="password" id="auth-password" class="text-input" placeholder="Password (min 4 chars)" autocomplete="current-password">
+        <p class="auth-error" id="auth-error"></p>
+        <button class="btn-ask" id="auth-submit">Create Account</button>
+        <button class="btn-link" id="auth-toggle">Already have an account? Log in →</button>
+      </div>
+      <div id="auth-loggedin" style="display:none">
+        <p class="auth-welcome">Signed in as <strong id="auth-username-display"></strong></p>
+        <button class="btn-secondary" id="auth-logout">Log out</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Results -->
+<div id="results-modal" class="modal-back" hidden>
+  <div class="modal modal-results" role="dialog" aria-modal="true">
+    <div class="modal-hdr">
+      <h2>Today's Result</h2>
+      <button class="modal-x" data-close="results-modal">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="reveal-box">
+        <div class="reveal-label">The secret number was</div>
+        <div class="reveal-num" id="reveal-num">—</div>
+      </div>
+      <div class="vs-row">
+        <div class="score-card" id="human-card">
+          <div class="score-who">You</div>
+          <div class="score-num" id="human-guess">—</div>
+          <div class="score-dist" id="human-dist"></div>
+          <div class="score-badge" id="human-badge"></div>
+        </div>
+        <div class="vs-label">VS</div>
+        <div class="score-card" id="ai-card">
+          <div class="score-who">AI</div>
+          <div class="score-num" id="ai-guess">—</div>
+          <div class="score-dist" id="ai-dist"></div>
+          <div class="score-badge" id="ai-badge"></div>
+        </div>
+      </div>
+      <p id="results-msg" class="results-msg"></p>
+      <div id="optimal-note" class="optimal-note" style="display:none">
+        <span id="optimal-note-text"></span>
+      </div>
+      <div class="tomorrow-box">
+        <div class="tmr-icon">📅</div>
+        <div class="tmr-title">Come back tomorrow!</div>
+        <div class="tmr-sub">A new number unlocks at midnight. Your streak is counting.</div>
+      </div>
+      <div id="results-signup" class="results-signup" style="display:none">
+        <p>Save your score to the leaderboard</p>
+        <small>Free account — tracks your win rate &amp; streak</small>
+        <button class="btn-signup" id="results-signup-btn">Create free account</button>
+      </div>
+      <div class="ai-walk">
+        <div class="ai-walk-hdr">AI's reasoning</div>
+        <div id="ai-qa-log"></div>
+      </div>
+      <p class="record-note">This game has been recorded to help improve the AI.</p>
+    </div>
+  </div>
+</div>
+
+<footer class="site-footer">
+  <a class="donate-btn" href="https://ko-fi.com/gauransharora" target="_blank" rel="noopener">
+    <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
+      <path d="M12 21.593c-5.63-5.539-11-10.297-11-14.402C1 3.518 4.04 1 7.5 1c2.035 0 3.945.97 4.5 2.09C12.555 1.97 14.465 1 16.5 1 19.96 1 23 3.518 23 7.191c0 4.105-5.37 8.863-11 14.402z"/>
+    </svg>
+    Fund future projects
+  </a>
+  <p class="footer-contact">For any queries / errors encountered please contact — <a href="mailto:gauransharora1404@gmail.com">gauransharora1404@gmail.com</a></p>
+</footer>
+
+<script src="game.js"></script>
+</body>
+</html>
