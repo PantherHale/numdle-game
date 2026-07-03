@@ -3,6 +3,7 @@
    NUMDLE — Wordle-style number-guessing game (MCQ edition)
 ═══════════════════════════════════════════════════════════════ */
 
+const API_BASE     = 'https://gauransharora.pythonanywhere.com';
 const MAX_Q        = 7;
 const MAX_TYPE_USE = 2;
 
@@ -358,7 +359,7 @@ function saveGameLog(humanGuess, humanDist, aiDist, outcome, optimalDist) {
 }
 
 async function postGameToServer(entry) {
-  try { await fetch('/log_game',{method:'POST',headers:apiHeaders(),body:JSON.stringify(entry)}); }
+  try { await fetch(`${API_BASE}/log_game`,{method:'POST',headers:apiHeaders(),body:JSON.stringify(entry)}); }
   catch(_) {}
 }
 
@@ -842,7 +843,7 @@ async function showLeaderboardPage() {
   document.getElementById('lb-page').style.display = 'flex';
   document.getElementById('lb-rankings').innerHTML = '<p class="muted" style="text-align:center;padding:16px">Loading…</p>';
   try {
-    const res  = await fetch('/api/leaderboard', {headers: apiHeaders()});
+    const res  = await fetch(`${API_BASE}/api/leaderboard`, {headers: apiHeaders()});
     const data = await res.json();
     renderLeaderboardPage(data);
   } catch(_) {
@@ -875,7 +876,7 @@ async function handleAuth() {
   if (!username||!password){errEl.textContent='Fill in both fields.';return;}
   errEl.textContent='Saving...';
   try {
-    const res=await fetch(authMode==='signup'?'/api/signup':'/api/login',
+    const res=await fetch(authMode==='signup'?`${API_BASE}/api/signup`:`${API_BASE}/api/login`,
       {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username,password})});
     const d=await res.json();
     if (!res.ok){errEl.textContent=d.error||'Something went wrong.';return;}
@@ -888,7 +889,7 @@ async function handleAuth() {
 }
 
 async function handleLogout() {
-  try{await fetch('/api/logout',{method:'POST',headers:apiHeaders()});}catch(_){}
+  try{await fetch(`${API_BASE}/api/logout`,{method:'POST',headers:apiHeaders()});}catch(_){}
   clearAuth(); updateAuthUI(); showToast('Logged out.');
 }
 
