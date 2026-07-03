@@ -74,14 +74,14 @@ def hash_pw(pw):
 
 def make_token(user_id):
     token   = secrets.token_hex(32)
-    expires = (datetime.utcnow() + timedelta(days=7)).isoformat()
+    expires = (datetime.utcnow() + timedelta(days=36500)).isoformat()  # ~100 years
     with get_db() as db:
         db.execute('INSERT INTO sessions (token,user_id,expires_at) VALUES (?,?,?)',
                    (token, user_id, expires))
     return token
 
 def auth_user(token=None):
-    """Validate token, refresh its expiry, return user dict or None."""
+    """Validate token, return user dict or None. Sessions never expire."""
     if not token:
         token = request.headers.get('X-Auth-Token') or request.args.get('token')
     if not token:
@@ -95,9 +95,6 @@ def auth_user(token=None):
         ).fetchone()
     if not row:
         return None
-    new_exp = (datetime.utcnow() + timedelta(days=7)).isoformat()
-    with get_db() as db:
-        db.execute('UPDATE sessions SET expires_at=? WHERE token=?', (new_exp, token))
     return dict(row)
 
 def is_suspicious(user_id):
@@ -153,7 +150,9 @@ def signup():
     except sqlite3.IntegrityError:
         return jsonify({'error': 'That username is already taken'}), 409
 
-    return jsonify({'ok': True, 'token': make_token(user_id), 'username': username})
+    resp = jsonify({'ok': True, 'token': make_token(user_id), 'username': username})
+    resp.headers['Access-Control-Allow-Origin'] = '*'
+    return resp
 
 
 @app.route('/api/login', methods=['POST'])
@@ -175,7 +174,9 @@ def login():
         db.execute('UPDATE users SET last_login=? WHERE id=?',
                    (datetime.utcnow().isoformat(), user['id']))
 
-    return jsonify({'ok': True, 'token': make_token(user['id']), 'username': user['username']})
+    resp = jsonify({'ok': True, 'token': make_token(user['id']), 'username': user['username']})
+    resp.headers['Access-Control-Allow-Origin'] = '*'
+    return resp
 
 
 @app.route('/api/me')
@@ -243,27 +244,25 @@ def leaderboard():
             ORDER BY wins * 1.0 / total_games DESC, total_games DESC
         ''').fetchall()
 
-    # AI entry from success_stats.json
+    # AI entry — always shown, stats from success_stats.json
     stats_path = os.path.join(LOG_DIR, 'success_stats.json')
-    ai_entry   = None
+    ai_wins = hum_wins = ties = n = 0
     if os.path.exists(stats_path):
         with open(stats_path, encoding='utf-8-sig') as f:
             s = json.load(f)
-        # Count per-day stats so AI shows one game per day, not one per game log
-        daily = s.get('daily', {})
-        n = len(daily)
-        if n:
-            ai_wins    = sum(1 for d in daily.values() if d.get('ai_wins', 0) > 0)
-            hum_wins   = sum(1 for d in daily.values() if d.get('human_wins', 0) > 0)
-            ties       = sum(1 for d in daily.values() if d.get('ties', 0) > 0)
-            ai_entry = {
-                'id': None, 'username': 'AI Bot', 'is_ai': True,
-                'total_games': n,
-                'wins': ai_wins, 'losses': hum_wins, 'ties': ties,
-                'win_rate': round(100.0 * ai_wins / n, 1),
-                'optimal_rate': 100,
-                'streak': n, 'avg_questions': 6, 'rank': None,
-            }
+        daily    = s.get('daily', {})
+        n        = len(daily)
+        ai_wins  = sum(1 for d in daily.values() if d.get('ai_wins', 0) > 0)
+        hum_wins = sum(1 for d in daily.values() if d.get('human_wins', 0) > 0)
+        ties     = sum(1 for d in daily.values() if d.get('ties', 0) > 0)
+    ai_entry = {
+        'id': None, 'username': 'AI Bot', 'is_ai': True,
+        'total_games': n,
+        'wins': ai_wins, 'losses': hum_wins, 'ties': ties,
+        'win_rate': round(100.0 * ai_wins / n, 1) if n else 0,
+        'optimal_rate': 100,
+        'streak': n, 'avg_questions': 7, 'rank': None,
+    }
 
     result   = []
     vis_rank = 1
@@ -418,7 +417,9 @@ def log_game():
           f"user={user['username'] if user else 'anon'}"
           f"{' (duplicate — ignored)' if already_played else ''}")
 
-    return jsonify({'ok': True, 'logged_in': bool(user)})
+    resp = jsonify({'ok': True, 'logged_in': bool(user)})
+    resp.headers['Access-Control-Allow-Origin'] = '*'
+    return resp
 
 # ── Admin (localhost only) ─────────────────────────────────────────────────────
 
