@@ -906,6 +906,14 @@ async function handleAuth() {
     updateAuthUI();
     document.getElementById('auth-password').value='';
     showToast(`Welcome, ${d.username}!`);
+    // If the user already finished today's game before logging in, save it now
+    const todayLogs = getLocalLogs().filter(l => l.date === TODAY);
+    if (gs && gs.gameOver && todayLogs.length > 0) {
+      const entry = todayLogs[todayLogs.length - 1];
+      const url = `${API_BASE}/log_game?token=${encodeURIComponent(d.token)}`;
+      fetch(url, {method:'POST', headers:{'Content-Type':'text/plain'}, body:JSON.stringify(entry)}).catch(()=>{});
+      showToast("Today's game saved to your account!");
+    }
   } catch(_){errEl.textContent='Network error.';}
 }
 
