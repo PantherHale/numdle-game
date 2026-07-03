@@ -798,6 +798,15 @@ function renderLbWeekGrid() {
   });
 }
 
+function calcAvgOff(serverVal) {
+  if (serverVal != null) return serverVal;
+  const logs = getLocalLogs();
+  if (!logs.length) return '—';
+  const dists = logs.map(l => l.human_distance).filter(d => d != null && !isNaN(d));
+  if (!dists.length) return '—';
+  return Math.round(dists.reduce((a, b) => a + b, 0) / dists.length);
+}
+
 function renderLeaderboardPage(data) {
   const me   = data.me;
   const list = data.leaderboard || [];
@@ -809,7 +818,7 @@ function renderLeaderboardPage(data) {
     document.getElementById('my-rank').textContent         = me.rank ?? '—';
     document.getElementById('my-display-name').textContent = me.username;
     document.getElementById('my-wins').textContent         = me.wins ?? 0;
-    document.getElementById('my-avg-off').textContent      = me.avg_distance != null ? me.avg_distance : '—';
+    document.getElementById('my-avg-off').textContent      = calcAvgOff(me.avg_distance);
     document.getElementById('my-streak').textContent       = me.streak ?? 0;
     document.getElementById('my-games').textContent        = me.total_games ?? 0;
     const sn = me.streak || 0;
@@ -825,7 +834,7 @@ function renderLeaderboardPage(data) {
       document.getElementById('my-display-name').textContent = localAuth.username;
       document.getElementById('my-rank').textContent    = '—';
       document.getElementById('my-wins').textContent    = '0';
-      document.getElementById('my-avg-off').textContent = '—';
+      document.getElementById('my-avg-off').textContent = calcAvgOff(null);
       document.getElementById('my-streak').textContent  = '0';
       document.getElementById('my-games').textContent   = '0';
       document.getElementById('my-streak-label').textContent = 'No games yet';
@@ -845,7 +854,7 @@ function renderLeaderboardPage(data) {
   const rows = list.filter(r => !r.suspicious).map(r => {
     const rCls   = r.rank===1?'lb-rank-1':r.rank===2?'lb-rank-2':r.rank===3?'lb-rank-3':'';
     const nameStr = escHtml(r.username) + (r.is_ai ? ' 🤖' : r.is_me ? ' ← you' : '');
-    const avgOff  = r.avg_distance != null ? r.avg_distance : '—';
+    const avgOff  = r.avg_distance != null ? r.avg_distance : (r.is_ai ? '—' : '—');
     return `<div class="lb-row${r.is_me?' lb-row-me':''}${r.is_ai?' lb-row-ai':''}">
       <span class="lb-row-rank ${rCls}">${r.rank ?? '—'}</span>
       <span class="lb-row-name">${nameStr}</span>

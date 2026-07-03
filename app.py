@@ -261,8 +261,8 @@ def leaderboard():
         rows = db.execute('''
             SELECT u.id, u.username,
                    COUNT(g.id) AS total_games,
-                   SUM(CASE WHEN g.human_distance <= 5 THEN 1 ELSE 0 END) AS wins,
-                   SUM(CASE WHEN g.human_distance > 5  THEN 1 ELSE 0 END) AS losses,
+                   SUM(CASE WHEN g.human_distance <= 15 THEN 1 ELSE 0 END) AS wins,
+                   SUM(CASE WHEN g.human_distance > 15  THEN 1 ELSE 0 END) AS losses,
                    0 AS ties,
                    ROUND(AVG(g.human_distance), 0) AS avg_human_distance
             FROM users u
@@ -285,7 +285,7 @@ def leaderboard():
             ai_n += 1
             d = v.get('ai_distance', 0)
             ai_total_dist += d
-            if d <= 5:
+            if d <= 15:
                 ai_wins += 1
     ai_avg_dist = round(ai_total_dist / ai_n, 1) if ai_n else 0
     ai_entry = {
@@ -329,7 +329,11 @@ def leaderboard():
     # Merge AI entry, sort everyone together, assign sequential ranks
     if ai_entry:
         result.append(ai_entry)
-    result.sort(key=lambda x: (-(x.get('wins') or 0), (x.get('avg_distance') if x.get('avg_distance') is not None else 9999)))
+    result.sort(key=lambda x: (
+        -(x.get('wins') or 0),
+        (x.get('avg_distance') if x.get('avg_distance') is not None else 9999),
+        x.get('username') or '',
+    ))
     rank_counter = 1
     for r in result:
         if r.get('suspicious'):
