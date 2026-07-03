@@ -269,21 +269,18 @@ def leaderboard():
             ORDER BY wins * 1.0 / total_games DESC, total_games DESC
         ''').fetchall()
 
-    # AI entry — stats from daily_data.json (one game per day, independent of users)
-    data_path = os.path.join(PUBLIC, 'daily_data.json')
-    ai_n = ai_exact = 0
-    ai_total_dist = 0
+    # AI entry — stats from logs/ai_game_log.json (written by precompute.py, one entry per day)
+    ai_log_path = os.path.join(LOG_DIR, 'ai_game_log.json')
+    ai_n = ai_exact = ai_total_dist = 0
     today_iso = date.today().isoformat()
-    if os.path.exists(data_path):
-        with open(data_path, encoding='utf-8') as f:
-            daily_data = json.load(f)
-        for iso, v in daily_data.items():
-            if iso.startswith('__') or not isinstance(v, dict) or 'ad' not in v:
-                continue
+    if os.path.exists(ai_log_path):
+        with open(ai_log_path, encoding='utf-8-sig') as f:
+            ai_log = json.load(f)
+        for iso, v in ai_log.items():
             if iso > today_iso:
-                continue  # don't count future days
+                continue  # only count days that have passed
             ai_n += 1
-            d = v.get('ad', 0)
+            d = v.get('ai_distance', 0)
             ai_total_dist += d
             if d == 0:
                 ai_exact += 1

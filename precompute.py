@@ -174,6 +174,26 @@ def main():
     kb = os.path.getsize(out_path) / 1024
     print(f"\nDone. Wrote {len(data)-1} days + weekly summaries to {out_path}  ({kb:.0f} KB)")
 
+    # Write AI game log to logs/ so PythonAnywhere leaderboard can read it
+    log_dir  = 'logs'
+    os.makedirs(log_dir, exist_ok=True)
+    log_path = os.path.join(log_dir, 'ai_game_log.json')
+    existing_log = {}
+    if os.path.exists(log_path):
+        with open(log_path, encoding='utf-8') as f:
+            existing_log = json.load(f)
+    for iso, v in data.items():
+        if iso.startswith('__') or not isinstance(v, dict) or 'ad' not in v:
+            continue
+        existing_log[iso] = {
+            'secret':      v['s'],
+            'ai_guess':    v['ag'],
+            'ai_distance': v['ad'],
+        }
+    with open(log_path, 'w', encoding='utf-8') as f:
+        json.dump(existing_log, f, indent=2, sort_keys=True)
+    print(f"AI game log updated: {log_path}  ({len(existing_log)} days total)")
+
     # Print this week's AI performance preview
     print("\n--- This week's AI preview ---")
     monday = get_monday(today)
