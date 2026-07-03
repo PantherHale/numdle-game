@@ -949,8 +949,7 @@ function setAuthMode(mode) {
   authMode=mode;
   const isSignup=mode==='signup';
   document.getElementById('auth-title').textContent   =isSignup?'Create Account':'Log In';
-  document.getElementById('auth-subtitle').textContent=isSignup?'Sign up to track your score on the leaderboard. Login stays active for one week.':'Welcome back!';
-  document.getElementById('auth-submit').textContent  =isSignup?'Create Account':'Log In';
+document.getElementById('auth-submit').textContent  =isSignup?'Create Account':'Log In';
   document.getElementById('auth-toggle').textContent  =isSignup?'Already have an account? Log in':'New here? Create an account';
   document.getElementById('auth-error').textContent   ='';
 }
