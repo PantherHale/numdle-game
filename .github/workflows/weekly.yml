@@ -1,4 +1,4 @@
-name: Numdle — Retrain AI & Deploy
+name: Numdle - Retrain AI and Deploy
 
 on:
   workflow_dispatch:
@@ -18,7 +18,11 @@ on:
         required: false
         default: '2'
         type: choice
-        options: ['1', '2', '3', '4']
+        options:
+          - '1'
+          - '2'
+          - '3'
+          - '4'
       skip_training:
         description: 'Skip AI fine-tuning (just precompute)'
         required: false
@@ -47,7 +51,6 @@ jobs:
       - name: Install dependencies
         run: pip install tensorflow numpy flask pandas
 
-      # Use input values if provided, otherwise fall back to saved secrets
       - name: Resolve config
         id: cfg
         run: |
@@ -75,9 +78,9 @@ jobs:
             LINES=$(python3 -c "import json; d=json.load(open('logs/week_${WEEK}.json')); print(len(d.get('games',[])))" 2>/dev/null || echo "?")
             echo "Downloaded $LINES game records"
             echo "log_file=logs/week_${WEEK}.json" >> $GITHUB_OUTPUT
-            echo "has_logs=true"                   >> $GITHUB_OUTPUT
+            echo "has_logs=true" >> $GITHUB_OUTPUT
           else
-            echo "::warning::Download failed (HTTP $STATUS) — training will be skipped"
+            echo "::warning::Download failed (HTTP $STATUS) - training will be skipped"
             echo "has_logs=false" >> $GITHUB_OUTPUT
           fi
 
@@ -87,19 +90,19 @@ jobs:
           echo "Fine-tuning on: ${{ steps.fetch_logs.outputs.log_file }}"
           python train_on_logs.py "${{ steps.fetch_logs.outputs.log_file }}" --epochs 20
 
-      - name: Precompute next ${{ inputs.weeks_ahead }} week(s)
+      - name: Precompute next weeks
         run: python precompute.py --next-week --weeks ${{ inputs.weeks_ahead }}
 
-      - name: Commit & push
+      - name: Commit and push
         run: |
           git config user.name  "numdle-bot"
           git config user.email "numdle-bot@users.noreply.github.com"
           git add public/daily_data.json
           git add logs/ai_game_log.json
-          git add logs/week_*.json 2>/dev/null || true
+          git add "logs/week_*.json" 2>/dev/null || true
           git add ../number_guessing_rl/checkpoints_7q/human_finetuned.weights.h5 2>/dev/null || true
           if git diff --cached --quiet; then
-            echo "Nothing new — skipping commit"
+            echo "Nothing new - skipping commit"
           else
             git commit -m "update: retrain + precompute $(date +%Y-%m-%d)"
             git push origin HEAD
