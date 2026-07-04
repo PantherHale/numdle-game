@@ -1,7 +1,7 @@
 """
 app.py — Numdle server with auth, leaderboard, and stats tracking.
 """
-import json, os, sqlite3, hashlib, secrets, time
+import json, os, sqlite3, hashlib, secrets, time, subprocess
 from datetime import date, timedelta, datetime
 from flask import Flask, send_from_directory, jsonify, request, abort
 
@@ -639,6 +639,24 @@ def export_logs():
         all_games.extend(wf.get('games', []))
     return jsonify({'total': len(all_games), 'games': all_games})
 
+
+@app.route('/dev/deploy', methods=['POST', 'GET'])
+def dev_deploy():
+    """Called by GitHub Actions after a push — pulls latest code and reloads."""
+    key = request.headers.get('X-Admin-Key') or request.args.get('key')
+    if key != os.environ.get('NUMDLE_ADMIN_KEY', ''):
+        return jsonify({'error': 'forbidden'}), 403
+    try:
+        pull = subprocess.run(
+            ['git', 'pull', '--ff-only'],
+            capture_output=True, text=True, cwd=os.path.dirname(__file__), timeout=30
+        )
+        wsgi = '/var/www/gauransharora_pythonanywhere_com_wsgi.py'
+        if os.path.exists(wsgi):
+            subprocess.run(['touch', wsgi], timeout=5)
+        return jsonify({'pulled': pull.stdout.strip(), 'err': pull.stderr.strip()})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 @app.route('/dev/extend-sessions')
 def dev_extend_sessions():
