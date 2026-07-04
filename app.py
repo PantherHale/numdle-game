@@ -7,8 +7,9 @@ from flask import Flask, send_from_directory, jsonify, request, abort
 
 app = Flask(__name__)
 
-# Simple in-memory cache for the public leaderboard (60-second TTL)
+# In-memory leaderboard cache — 5-minute TTL, busted on every game log
 _lb_cache = {'data': None, 'ts': 0}
+_LB_TTL   = 300  # seconds
 
 @app.after_request
 def add_cors(response):
@@ -266,7 +267,7 @@ def calculate_streak(user_id):
 def leaderboard():
     me_user = auth_user()
     # Serve cached public data to anonymous visitors (saves CPU seconds)
-    if not me_user and _lb_cache['data'] and time.time() - _lb_cache['ts'] < 60:
+    if not me_user and _lb_cache['data'] and time.time() - _lb_cache['ts'] < _LB_TTL:
         return _lb_cache['data']
 
     with get_db() as db:
@@ -459,6 +460,7 @@ def log_game():
                 already_played = True
 
     if not already_played:
+        _lb_cache['ts'] = 0  # bust leaderboard cache so new score shows immediately
         update_success_stats(data.get('outcome'), data.get('human_distance'), data.get('ai_distance'))
 
         # Save full game to player_wins/ when human beats AI
