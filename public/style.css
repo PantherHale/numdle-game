@@ -879,3 +879,7 @@ body {
   font-size: .68rem;
   color: var(--muted, #aaa);
 }
+
+.lb-update-note {
+  font-size: .68rem; color: var(--muted); margin-bottom: 6px;
+}
