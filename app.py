@@ -81,21 +81,27 @@ def make_token(user_id):
     return token
 
 def auth_user(token=None):
-    """Validate token, return user dict or None. Sessions never expire."""
+    """Validate token, return user dict or None. Auto-extends short-lived legacy sessions."""
     if not token:
         token = request.headers.get('X-Auth-Token') or request.args.get('token')
     if not token:
         return None
-    now = datetime.utcnow().isoformat()
+    now     = datetime.utcnow().isoformat()
+    far     = (datetime.utcnow() + timedelta(days=36500)).isoformat()
     with get_db() as db:
+        # Accept both valid AND recently-expired sessions (within last 90 days)
+        cutoff = (datetime.utcnow() - timedelta(days=90)).isoformat()
         row = db.execute(
-            'SELECT u.id, u.username FROM sessions s '
+            'SELECT u.id, u.username, s.expires_at FROM sessions s '
             'JOIN users u ON s.user_id=u.id '
-            'WHERE s.token=? AND s.expires_at>?', (token, now)
+            'WHERE s.token=? AND s.expires_at>?', (token, cutoff)
         ).fetchone()
-    if not row:
-        return None
-    return dict(row)
+        if not row:
+            return None
+        # Silently extend any session that isn't already ~100 years
+        if row['expires_at'] < far[:10]:
+            db.execute('UPDATE sessions SET expires_at=? WHERE token=?', (far, token))
+    return {'id': row['id'], 'username': row['username']}
 
 def is_suspicious(user_id):
     """True if user won with <5 questions four times in a row (cheating heuristic)."""
@@ -621,6 +627,15 @@ def export_logs():
         all_games.extend(wf.get('games', []))
     return jsonify({'total': len(all_games), 'games': all_games})
 
+
+@app.route('/dev/extend-sessions')
+def dev_extend_sessions():
+    """One-time fix: extend all sessions to 100 years so no one gets logged out."""
+    far = (datetime.utcnow() + timedelta(days=36500)).isoformat()
+    with get_db() as db:
+        cur = db.execute('UPDATE sessions SET expires_at=?', (far,))
+        count = cur.rowcount
+    return jsonify({'extended': count, 'new_expiry': far[:10]})
 
 @app.route('/dev/reset-today')
 def dev_reset_today():
