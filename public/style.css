@@ -837,25 +837,16 @@ body {
   margin-top: 8px;
 }
 
-.donate-float {
-  position: fixed;
-  bottom: 18px;
-  right: 18px;
-  z-index: 40;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 8px 16px;
-  border-radius: 99px;
-  background: #ff5f5f;
-  color: #fff;
-  font-size: .78rem;
-  font-weight: 600;
-  text-decoration: none;
-  box-shadow: 0 3px 12px rgba(255,95,95,.45);
+.wv-support-btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 9px 22px; border-radius: 99px;
+  background: #ff5f5f; color: #fff;
+  font-size: .82rem; font-weight: 600; text-decoration: none;
+  box-shadow: 0 2px 8px rgba(255,95,95,.35);
   transition: transform .15s, box-shadow .15s;
+  align-self: center; margin-top: 4px;
 }
-.donate-float:hover { transform: translateY(-2px); box-shadow: 0 5px 16px rgba(255,95,95,.55); }
+.wv-support-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 14px rgba(255,95,95,.5); }
 
 .donate-btn {
   display: inline-flex;
