@@ -1,11 +1,14 @@
 """
 app.py — Numdle server with auth, leaderboard, and stats tracking.
 """
-import json, os, sqlite3, hashlib, secrets
+import json, os, sqlite3, hashlib, secrets, time
 from datetime import date, timedelta, datetime
 from flask import Flask, send_from_directory, jsonify, request, abort
 
 app = Flask(__name__)
+
+# Simple in-memory cache for the public leaderboard (60-second TTL)
+_lb_cache = {'data': None, 'ts': 0}
 
 @app.after_request
 def add_cors(response):
@@ -262,6 +265,9 @@ def calculate_streak(user_id):
 @app.route('/api/leaderboard')
 def leaderboard():
     me_user = auth_user()
+    # Serve cached public data to anonymous visitors (saves CPU seconds)
+    if not me_user and _lb_cache['data'] and time.time() - _lb_cache['ts'] < 60:
+        return _lb_cache['data']
 
     with get_db() as db:
         rows = db.execute('''
@@ -350,6 +356,10 @@ def leaderboard():
 
     resp = jsonify({'leaderboard': result, 'me': me_entry})
     resp.headers['Access-Control-Allow-Origin'] = '*'
+    # Cache the response for anonymous visitors
+    if not me_user:
+        _lb_cache['data'] = resp
+        _lb_cache['ts']   = time.time()
     return resp
 
 # ── Game log + stats ───────────────────────────────────────────────────────────
