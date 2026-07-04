@@ -19,11 +19,12 @@
 }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html { height: 100%; }
+html { height: 100%; overflow-x: hidden; }
 body {
   background: var(--bg); color: var(--text);
   font-family: 'Clear Sans', 'Helvetica Neue', Arial, sans-serif;
   min-height: 100%; display: flex; flex-direction: column; align-items: center;
+  overflow-x: hidden; width: 100%;
 }
 
 /* ── Header ── */
@@ -132,10 +133,13 @@ body {
   min-height: 52px;
   max-height: 220px;
   overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: none;
   border-radius: 10px;
   border: 1px solid var(--border);
   background: var(--border2);
 }
+.candidate-grid::-webkit-scrollbar { display: none; }
 
 .candidate-chip {
   display: inline-flex;
@@ -550,8 +554,8 @@ body {
 ════════════════════════════════════════ */
 #lb-page {
   position: fixed; inset: 0; z-index: 90;
-  background: #fff; overflow-y: auto;
-  display: flex; flex-direction: column;
+  background: #fff; overflow-y: auto; overflow-x: hidden;
+  display: flex; flex-direction: column; width: 100%;
 }
 .lb-page-hdr {
   position: sticky; top: 0; z-index: 10;
@@ -732,18 +736,50 @@ body {
 
 /* ── Responsive — small mobile ── */
 @media (max-width: 420px) {
-  .hdr-center h1    { font-size: 1.25rem; }
-  .q-text           { font-size: .8rem; }
-  .q-item-text      { font-size: .78rem; }
+  #app              { padding: 8px 8px 60px; gap: 10px; }
+  .hdr              { padding: 0 8px; height: 50px; }
+  .hdr-center h1    { font-size: 1.15rem; }
+  .hdr-sub          { font-size: .58rem; }
+  .icon-btn svg     { width: 20px; height: 20px; }
+  .hdr-side         { width: 64px; }
+
+  .day-pill         { min-width: 38px; padding: 5px 2px; }
+  .day-pill .dp-name  { font-size: .52rem; }
+  .day-pill .dp-score { font-size: .64rem; }
+
+  .status-pill      { font-size: .65rem; padding: 3px 10px; }
+  .candidate-chip   { min-width: 28px; font-size: .68rem; padding: 2px 5px; }
+  .candidate-grid   { max-height: 160px; padding: 7px; gap: 4px; }
+  .grid-behavior    { font-size: .62rem; }
+
+  .q-row            { padding: 9px 10px; min-height: 44px; }
+  .slot-hdr         { padding: 9px 10px; min-height: 44px; }
+  .q-text           { font-size: .78rem; }
+  .q-item           { padding: 7px 10px; min-height: 34px; }
+  .q-item-text      { font-size: .76rem; }
+  .question-list    { max-height: 200px; }
+  .type-tab         { font-size: .65rem; padding: 0 6px; min-height: 26px; }
+
+  .text-input       { padding: 10px 12px; font-size: .9rem; }
+  .btn-ask          { padding: 10px 14px; font-size: .85rem; }
+
   .vs-row           { flex-direction: column; gap: 8px; }
   .vs-label         { padding: 0; text-align: center; }
-  .type-tab         { font-size: .68rem; padding: 0 7px; }
   .lb-my-stats      { grid-template-columns: repeat(2, 1fr); }
-  .wv-days          { gap: 4px; }
-  .wv-day           { padding: 8px 2px; min-height: 72px; }
-  .lb-week-grid     { gap: 4px; }
+  .wv-days          { gap: 3px; }
+  .wv-day           { padding: 6px 2px; min-height: 64px; }
+  .wv-day-num       { font-size: .62rem; }
+  .wv-day-icon      { font-size: .95rem; }
+  .wv-stats         { gap: 5px; }
+  .wv-val           { font-size: 1.1rem; }
+  .wv-stat small    { font-size: .55rem; }
+
+  .lb-week-grid     { gap: 3px; }
   .lb-rankings-hdr,
-  .lb-row           { grid-template-columns: 26px 1fr 36px 46px 34px; font-size: .76rem; }
+  .lb-row           { grid-template-columns: 22px 1fr 32px 40px 30px; font-size: .72rem; padding: 9px 8px; }
+  .lb-my-card,
+  .lb-signup-card   { margin: 8px; }
+  .lb-section       { padding: 0 8px; }
 }
 
 /* ── Responsive — laptop / desktop ── */
