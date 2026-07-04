@@ -883,3 +883,24 @@ body {
 .lb-update-note {
   font-size: .68rem; color: var(--muted); margin-bottom: 6px;
 }
+
+/* ── Ads ── */
+.sidebar-ad {
+  display: none;
+  position: fixed;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 160px;
+  z-index: 5;
+}
+@media (min-width: 900px) {
+  .sidebar-ad { display: block; }
+}
+
+.lb-ad-bottom {
+  padding: 16px 16px 24px;
+  width: 100%;
+  max-width: 700px;
+  align-self: center;
+}
