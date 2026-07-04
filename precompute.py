@@ -45,7 +45,10 @@ def parse_args():
 
 
 def load_agent():
-    checkpoint_dir = os.path.join('..', 'number_guessing_rl', 'checkpoints_7q')
+    _here = os.path.dirname(os.path.abspath(__file__))
+    checkpoint_dir = os.path.join(_here, 'checkpoints_7q')
+    if not os.path.isdir(checkpoint_dir):
+        checkpoint_dir = os.path.join(_here, '..', 'number_guessing_rl', 'checkpoints_7q')
     checkpoints    = glob.glob(os.path.join(checkpoint_dir, '*.weights.h5'))
 
     env   = NumberGuessingEnv(number_range=NUMBER_RANGE, max_questions=MAX_QUESTIONS)
