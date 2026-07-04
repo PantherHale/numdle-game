@@ -1,30 +1,43 @@
-name: Weekly — Retrain AI & Deploy
+name: Numdle — Retrain AI & Deploy
 
 on:
-  schedule:
-    - cron: '0 2 * * 0'   # Every Sunday 2 AM UTC
-  workflow_dispatch:        # Manual trigger from GitHub → Actions tab
+  workflow_dispatch:
     inputs:
+      server_url:
+        description: 'Backend URL to download logs from'
+        required: false
+        default: ''
+        type: string
+      admin_key:
+        description: 'Admin key (leave blank to use saved secret)'
+        required: false
+        default: ''
+        type: string
+      weeks_ahead:
+        description: 'How many weeks to precompute ahead'
+        required: false
+        default: '2'
+        type: choice
+        options: ['1', '2', '3', '4']
       skip_training:
-        description: 'Skip fine-tuning (just precompute)'
-        type: boolean
+        description: 'Skip AI fine-tuning (just precompute)'
+        required: false
         default: false
+        type: boolean
 
 jobs:
-  weekly-update:
+  update:
     runs-on: ubuntu-latest
     timeout-minutes: 40
 
     steps:
 
-      # ── 1. Checkout ────────────────────────────────────────────────────────
       - name: Checkout repo
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      # ── 2. Python 3.11 ─────────────────────────────────────────────────────
       - name: Set up Python 3.11
         uses: actions/setup-python@v5
         with:
@@ -34,38 +47,49 @@ jobs:
       - name: Install dependencies
         run: pip install tensorflow numpy flask pandas
 
-      # ── 3. Download this week's game logs from PythonAnywhere ──────────────
+      # Use input values if provided, otherwise fall back to saved secrets
+      - name: Resolve config
+        id: cfg
+        run: |
+          URL="${{ inputs.server_url }}"
+          KEY="${{ inputs.admin_key }}"
+          [ -z "$URL" ] && URL="${{ secrets.NUMDLE_SERVER_URL }}"
+          [ -z "$KEY" ] && KEY="${{ secrets.NUMDLE_ADMIN_KEY }}"
+          echo "url=$URL" >> $GITHUB_OUTPUT
+          echo "key=$KEY" >> $GITHUB_OUTPUT
+          echo "Using server: $URL"
+
       - name: Download game logs
         id: fetch_logs
-        env:
-          SERVER_URL: ${{ secrets.NUMDLE_SERVER_URL }}
-          ADMIN_KEY:  ${{ secrets.NUMDLE_ADMIN_KEY }}
         run: |
+          URL="${{ steps.cfg.outputs.url }}"
+          KEY="${{ steps.cfg.outputs.key }}"
           WEEK=$(python3 -c "from datetime import date,timedelta; d=date.today(); print((d-timedelta(days=d.weekday())).isoformat())")
+          echo "Downloading logs for week $WEEK from $URL"
           STATUS=$(curl -s -o logs/week_${WEEK}.json \
             -w "%{http_code}" \
-            -H "X-Admin-Key: $ADMIN_KEY" \
-            "$SERVER_URL/admin/logs/export")
-          echo "HTTP $STATUS  week=$WEEK"
+            -H "X-Admin-Key: $KEY" \
+            "$URL/admin/logs/export")
+          echo "HTTP status: $STATUS"
           if [ "$STATUS" = "200" ]; then
+            LINES=$(python3 -c "import json; d=json.load(open('logs/week_${WEEK}.json')); print(len(d.get('games',[])))" 2>/dev/null || echo "?")
+            echo "Downloaded $LINES game records"
             echo "log_file=logs/week_${WEEK}.json" >> $GITHUB_OUTPUT
             echo "has_logs=true"                   >> $GITHUB_OUTPUT
           else
-            echo "::warning::Log download failed (HTTP $STATUS) — skipping training"
+            echo "::warning::Download failed (HTTP $STATUS) — training will be skipped"
             echo "has_logs=false" >> $GITHUB_OUTPUT
           fi
 
-      # ── 4. Fine-tune AI on this week's human games ─────────────────────────
       - name: Fine-tune AI on human game logs
         if: ${{ !inputs.skip_training && steps.fetch_logs.outputs.has_logs == 'true' }}
         run: |
+          echo "Fine-tuning on: ${{ steps.fetch_logs.outputs.log_file }}"
           python train_on_logs.py "${{ steps.fetch_logs.outputs.log_file }}" --epochs 20
 
-      # ── 5. Precompute next 2 weeks of AI answers ────────────────────────────
-      - name: Precompute next 2 weeks
-        run: python precompute.py --next-week --weeks 2
+      - name: Precompute next ${{ inputs.weeks_ahead }} week(s)
+        run: python precompute.py --next-week --weeks ${{ inputs.weeks_ahead }}
 
-      # ── 6. Commit everything back to the repo ──────────────────────────────
       - name: Commit & push
         run: |
           git config user.name  "numdle-bot"
@@ -75,26 +99,17 @@ jobs:
           git add logs/week_*.json 2>/dev/null || true
           git add ../number_guessing_rl/checkpoints_7q/human_finetuned.weights.h5 2>/dev/null || true
           if git diff --cached --quiet; then
-            echo "Nothing new to commit."
+            echo "Nothing new — skipping commit"
           else
-            UNTIL=$(python3 -c "
-from datetime import date, timedelta
-d = date.today()
-mon = d + timedelta(days=(7 - d.weekday()) % 7 + 7)
-print((mon + timedelta(days=13)).isoformat())")
-            git commit -m "weekly: retrain + precompute through ${UNTIL}"
+            git commit -m "update: retrain + precompute $(date +%Y-%m-%d)"
             git push origin HEAD
           fi
 
-      # ── 7. Tell PythonAnywhere to git pull + reload ─────────────────────────
       - name: Deploy to PythonAnywhere
         if: always()
-        env:
-          SERVER_URL: ${{ secrets.NUMDLE_SERVER_URL }}
-          ADMIN_KEY:  ${{ secrets.NUMDLE_ADMIN_KEY }}
         run: |
-          curl -s -X POST \
-            -H "X-Admin-Key: $ADMIN_KEY" \
-            "$SERVER_URL/dev/deploy" || echo "Deploy ping skipped (non-fatal)"
-
-      # Cloudflare auto-deploys on every git push — nothing extra needed.
+          URL="${{ steps.cfg.outputs.url }}"
+          KEY="${{ steps.cfg.outputs.key }}"
+          curl -s -X POST -H "X-Admin-Key: $KEY" "$URL/dev/deploy" \
+            && echo "PythonAnywhere reloaded" \
+            || echo "Deploy ping failed (non-fatal)"
