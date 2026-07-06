@@ -18,6 +18,13 @@ def add_cors(response):
     response.headers['Access-Control-Allow-Methods'] = 'GET, POST, OPTIONS'
     return response
 
+@app.errorhandler(500)
+def server_error(e):
+    resp = jsonify({'error': str(e)})
+    resp.status_code = 500
+    resp.headers['Access-Control-Allow-Origin'] = '*'
+    return resp
+
 @app.route('/api/<path:path>', methods=['OPTIONS'])
 def options_handler(path):
     return '', 204
