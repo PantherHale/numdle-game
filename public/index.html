@@ -9,17 +9,12 @@
 </head>
 <body>
 
-<!-- ── Left sidebar ad (desktop only) ── -->
+<!-- ── Left sidebar ad (desktop only, initialized after load) ── -->
 <div class="sidebar-ad" id="sidebar-ad">
   <ins class="adsbygoogle"
        style="display:inline-block;width:160px;height:600px"
        data-ad-client="ca-pub-8008891990486334"
        data-ad-slot="5535826885"></ins>
-  <script>
-    if (window.getComputedStyle(document.getElementById('sidebar-ad')).display !== 'none') {
-      (adsbygoogle = window.adsbygoogle || []).push({});
-    }
-  </script>
 </div>
 
 <!-- ── Header ── -->
@@ -125,7 +120,7 @@
     </div>
   </div>
 
-  <!-- Leaderboard bottom ad -->
+  <!-- Leaderboard bottom ad (initialized when leaderboard is shown) -->
   <div class="lb-ad-bottom">
     <ins class="adsbygoogle"
          style="display:block"
@@ -133,7 +128,6 @@
          data-ad-slot="9798505524"
          data-ad-format="auto"
          data-full-width-responsive="true"></ins>
-    <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
   </div>
 </div>
 
@@ -356,5 +350,24 @@
 </footer>
 
 <script src="game.js"></script>
+<script>
+  // Initialize sidebar ad after page load (only when visible on desktop)
+  window.addEventListener('load', function() {
+    var sidebar = document.getElementById('sidebar-ad');
+    if (sidebar && window.getComputedStyle(sidebar).display !== 'none') {
+      (adsbygoogle = window.adsbygoogle || []).push({});
+    }
+  });
+  // Initialize leaderboard bottom ad the first time the leaderboard is shown
+  var _lbAdPushed = false;
+  function initLbAd() {
+    if (_lbAdPushed) return;
+    var ins = document.querySelector('.lb-ad-bottom .adsbygoogle');
+    if (ins && ins.offsetWidth > 0) {
+      _lbAdPushed = true;
+      (adsbygoogle = window.adsbygoogle || []).push({});
+    }
+  }
+</script>
 </body>
 </html>

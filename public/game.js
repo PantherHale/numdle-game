@@ -884,6 +884,7 @@ function renderLeaderboardPage(data) {
 async function showLeaderboardPage() {
   renderLbWeekGrid();
   document.getElementById('lb-page').style.display = 'flex';
+  if (typeof initLbAd === 'function') initLbAd();
   document.getElementById('lb-rankings').innerHTML = '<p class="muted" style="text-align:center;padding:16px">Loading…</p>';
   try {
     const token = getAuth()?.token;
