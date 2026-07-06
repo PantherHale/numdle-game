@@ -234,10 +234,10 @@ def change_password():
 # ── Leaderboard ────────────────────────────────────────────────────────────────
 
 def calculate_streak(user_id):
-    """Count consecutive daily wins/ties ending today or yesterday."""
+    """Count consecutive days played ending today or yesterday."""
     with get_db() as db:
         rows = db.execute(
-            'SELECT date, outcome FROM game_records WHERE user_id=? ORDER BY date DESC',
+            'SELECT date FROM game_records WHERE user_id=? ORDER BY date DESC',
             (user_id,)
         ).fetchall()
     if not rows:
@@ -255,11 +255,8 @@ def calculate_streak(user_id):
             continue  # duplicate
         if d < expected:
             break     # gap in days
-        if row['outcome'] in ('human_wins', 'tie'):
-            streak  += 1
-            expected = d - timedelta(days=1)
-        else:
-            break
+        streak  += 1
+        expected = d - timedelta(days=1)
     return streak
 
 

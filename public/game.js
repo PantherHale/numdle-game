@@ -734,7 +734,7 @@ function renderWeekView() {
     const iso2 = `${cur.getFullYear()}-${pad2(cur.getMonth()+1)}-${pad2(cur.getDate())}`;
     if (iso2 > TODAY) { cur.setDate(cur.getDate()-1); continue; }
     const g = localLogs.find(l => l.date === iso2);
-    if (g && (g.outcome === 'human_wins' || g.outcome === 'tie')) { streak++; cur.setDate(cur.getDate()-1); }
+    if (g) { streak++; cur.setDate(cur.getDate()-1); }
     else break;
   }
 
