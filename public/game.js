@@ -7,6 +7,10 @@ const API_BASE     = 'https://gauransharora.pythonanywhere.com';
 const MAX_Q        = 7;
 const MAX_TYPE_USE = 2;
 
+function escHtml(s) {
+  return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
 /* ── Question catalogue (mirrors numberl-master/src/questions.js) ─ */
 const TYPE_ORDER = ['range','proximity','parity','modular','digit_sum','special','digit_compare','divisible'];
 
