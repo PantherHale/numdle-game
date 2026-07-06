@@ -807,6 +807,20 @@ function calcAvgOff(serverVal) {
   return Math.round(dists.reduce((a, b) => a + b, 0) / dists.length);
 }
 
+function calcStreak(serverVal) {
+  if (serverVal) return serverVal;
+  const logs = getLocalLogs();
+  if (!logs.length) return 0;
+  let streak = 0;
+  let cur = new Date();
+  while (true) {
+    const iso = `${cur.getFullYear()}-${pad2(cur.getMonth()+1)}-${pad2(cur.getDate())}`;
+    if (logs.find(l => l.date === iso)) { streak++; cur.setDate(cur.getDate()-1); }
+    else break;
+  }
+  return streak;
+}
+
 function renderLeaderboardPage(data) {
   const me   = data.me;
   const list = data.leaderboard || [];
@@ -819,9 +833,9 @@ function renderLeaderboardPage(data) {
     document.getElementById('my-display-name').textContent = me.username;
     document.getElementById('my-wins').textContent         = me.wins ?? 0;
     document.getElementById('my-avg-off').textContent      = calcAvgOff(me.avg_distance);
-    document.getElementById('my-streak').textContent       = me.streak ?? 0;
+    document.getElementById('my-streak').textContent       = calcStreak(me.streak);
     document.getElementById('my-games').textContent        = me.total_games ?? 0;
-    const sn = me.streak || 0;
+    const sn = calcStreak(me.streak);
     document.getElementById('my-streak-label').textContent = sn > 0 ? `${sn}-day streak 🔥` : 'No current streak';
     if (myCard) myCard.style.display = 'block';
     if (signCard) signCard.style.display = 'none';
@@ -835,9 +849,10 @@ function renderLeaderboardPage(data) {
       document.getElementById('my-rank').textContent    = '—';
       document.getElementById('my-wins').textContent    = '0';
       document.getElementById('my-avg-off').textContent = calcAvgOff(null);
-      document.getElementById('my-streak').textContent  = '0';
+      const fs = calcStreak(0);
+      document.getElementById('my-streak').textContent  = fs;
       document.getElementById('my-games').textContent   = '0';
-      document.getElementById('my-streak-label').textContent = 'No games yet';
+      document.getElementById('my-streak-label').textContent = fs > 0 ? `${fs}-day streak 🔥` : 'No games yet';
       if (myCard) myCard.style.display = 'block';
     } else {
       if (myCard) myCard.style.display = 'none';
