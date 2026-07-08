@@ -727,8 +727,8 @@ function renderWeekView() {
   const pad2 = n => String(n).padStart(2,'0');
   const monthPrefix = `${year}-${pad2(month+1)}`;
   const monthGames  = localLogs.filter(l => l.date.startsWith(monthPrefix));
-  const wins   = monthGames.filter(g => g.outcome === 'human_wins').length;
-  const losses = monthGames.filter(g => g.outcome === 'ai_wins').length;
+  const wins   = monthGames.filter(g => g.human_distance != null && g.human_distance <= 15).length;
+  const losses = monthGames.filter(g => g.human_distance != null && g.human_distance > 15).length;
   const rate   = monthGames.length ? Math.round(100 * wins / monthGames.length) : 0;
 
   /* Streak (backwards from today) */
