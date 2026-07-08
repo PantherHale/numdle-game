@@ -815,10 +815,11 @@ function calcStreak(serverVal) {
   if (serverVal) return serverVal;
   const logs = getLocalLogs();
   if (!logs.length) return 0;
+  const p2 = n => String(n).padStart(2,'0');
   let streak = 0;
   let cur = new Date();
   while (true) {
-    const iso = `${cur.getFullYear()}-${pad2(cur.getMonth()+1)}-${pad2(cur.getDate())}`;
+    const iso = `${cur.getFullYear()}-${p2(cur.getMonth()+1)}-${p2(cur.getDate())}`;
     if (logs.find(l => l.date === iso)) { streak++; cur.setDate(cur.getDate()-1); }
     else break;
   }
