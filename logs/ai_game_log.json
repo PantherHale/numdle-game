@@ -523,5 +523,145 @@
     "ai_distance": 20,
     "ai_guess": 405,
     "secret": 425
+  },
+  "2026-10-19": {
+    "ai_distance": 20,
+    "ai_guess": 373,
+    "secret": 353
+  },
+  "2026-10-20": {
+    "ai_distance": 20,
+    "ai_guess": 223,
+    "secret": 243
+  },
+  "2026-10-21": {
+    "ai_distance": 140,
+    "ai_guess": 845,
+    "secret": 985
+  },
+  "2026-10-22": {
+    "ai_distance": 40,
+    "ai_guess": 422,
+    "secret": 382
+  },
+  "2026-10-23": {
+    "ai_distance": 60,
+    "ai_guess": 80,
+    "secret": 20
+  },
+  "2026-10-24": {
+    "ai_distance": 20,
+    "ai_guess": 620,
+    "secret": 640
+  },
+  "2026-10-25": {
+    "ai_distance": 40,
+    "ai_guess": 598,
+    "secret": 638
+  },
+  "2026-10-26": {
+    "ai_distance": 0,
+    "ai_guess": 483,
+    "secret": 483
+  },
+  "2026-10-27": {
+    "ai_distance": 60,
+    "ai_guess": 786,
+    "secret": 846
+  },
+  "2026-10-28": {
+    "ai_distance": 160,
+    "ai_guess": 835,
+    "secret": 675
+  },
+  "2026-10-29": {
+    "ai_distance": 20,
+    "ai_guess": 586,
+    "secret": 566
+  },
+  "2026-10-30": {
+    "ai_distance": 20,
+    "ai_guess": 821,
+    "secret": 801
+  },
+  "2026-10-31": {
+    "ai_distance": 40,
+    "ai_guess": 593,
+    "secret": 633
+  },
+  "2026-11-01": {
+    "ai_distance": 60,
+    "ai_guess": 211,
+    "secret": 151
+  },
+  "2026-11-02": {
+    "ai_distance": 180,
+    "ai_guess": 837,
+    "secret": 657
+  },
+  "2026-11-03": {
+    "ai_distance": 20,
+    "ai_guess": 86,
+    "secret": 106
+  },
+  "2026-11-04": {
+    "ai_distance": 20,
+    "ai_guess": 835,
+    "secret": 855
+  },
+  "2026-11-05": {
+    "ai_distance": 80,
+    "ai_guess": 407,
+    "secret": 327
+  },
+  "2026-11-06": {
+    "ai_distance": 120,
+    "ai_guess": 866,
+    "secret": 746
+  },
+  "2026-11-07": {
+    "ai_distance": 140,
+    "ai_guess": 847,
+    "secret": 987
+  },
+  "2026-11-08": {
+    "ai_distance": 40,
+    "ai_guess": 400,
+    "secret": 440
+  },
+  "2026-11-09": {
+    "ai_distance": 0,
+    "ai_guess": 219,
+    "secret": 219
+  },
+  "2026-11-10": {
+    "ai_distance": 60,
+    "ai_guess": 64,
+    "secret": 124
+  },
+  "2026-11-11": {
+    "ai_distance": 20,
+    "ai_guess": 830,
+    "secret": 850
+  },
+  "2026-11-12": {
+    "ai_distance": 0,
+    "ai_guess": 786,
+    "secret": 786
+  },
+  "2026-11-13": {
+    "ai_distance": 0,
+    "ai_guess": 76,
+    "secret": 76
+  },
+  "2026-11-14": {
+    "ai_distance": 80,
+    "ai_guess": 221,
+    "secret": 141
+  },
+  "2026-11-15": {
+    "ai_distance": 0,
+    "ai_guess": 67,
+    "secret": 67
   }
 }
