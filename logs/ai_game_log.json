@@ -663,5 +663,110 @@
     "ai_distance": 0,
     "ai_guess": 67,
     "secret": 67
+  },
+  "2026-11-16": {
+    "ai_distance": 40,
+    "ai_guess": 230,
+    "secret": 190
+  },
+  "2026-11-17": {
+    "ai_distance": 120,
+    "ai_guess": 258,
+    "secret": 138
+  },
+  "2026-11-18": {
+    "ai_distance": 60,
+    "ai_guess": 462,
+    "secret": 402
+  },
+  "2026-11-19": {
+    "ai_distance": 20,
+    "ai_guess": 866,
+    "secret": 886
+  },
+  "2026-11-20": {
+    "ai_distance": 60,
+    "ai_guess": 831,
+    "secret": 771
+  },
+  "2026-11-21": {
+    "ai_distance": 0,
+    "ai_guess": 240,
+    "secret": 240
+  },
+  "2026-11-22": {
+    "ai_distance": 60,
+    "ai_guess": 394,
+    "secret": 454
+  },
+  "2026-11-23": {
+    "ai_distance": 0,
+    "ai_guess": 206,
+    "secret": 206
+  },
+  "2026-11-24": {
+    "ai_distance": 140,
+    "ai_guess": 777,
+    "secret": 637
+  },
+  "2026-11-25": {
+    "ai_distance": 80,
+    "ai_guess": 839,
+    "secret": 919
+  },
+  "2026-11-26": {
+    "ai_distance": 120,
+    "ai_guess": 838,
+    "secret": 958
+  },
+  "2026-11-27": {
+    "ai_distance": 0,
+    "ai_guess": 721,
+    "secret": 721
+  },
+  "2026-11-28": {
+    "ai_distance": 140,
+    "ai_guess": 842,
+    "secret": 982
+  },
+  "2026-11-29": {
+    "ai_distance": 0,
+    "ai_guess": 742,
+    "secret": 742
+  },
+  "2026-11-30": {
+    "ai_distance": 40,
+    "ai_guess": 407,
+    "secret": 447
+  },
+  "2026-12-01": {
+    "ai_distance": 120,
+    "ai_guess": 838,
+    "secret": 718
+  },
+  "2026-12-02": {
+    "ai_distance": 20,
+    "ai_guess": 86,
+    "secret": 106
+  },
+  "2026-12-03": {
+    "ai_distance": 40,
+    "ai_guess": 237,
+    "secret": 197
+  },
+  "2026-12-04": {
+    "ai_distance": 60,
+    "ai_guess": 219,
+    "secret": 279
+  },
+  "2026-12-05": {
+    "ai_distance": 0,
+    "ai_guess": 480,
+    "secret": 480
+  },
+  "2026-12-06": {
+    "ai_distance": 20,
+    "ai_guess": 219,
+    "secret": 199
   }
 }
