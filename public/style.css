@@ -24,7 +24,7 @@
   --shadow-md: 0 8px 24px rgba(33,24,9,.10);
   --shadow-lg: 0 20px 54px rgba(33,24,9,.18);
   --font-display: 'Sora', 'Clear Sans', sans-serif;
-  --font-body: 'Inter', 'Helvetica Neue', Arial, sans-serif;
+  --font-body: 'Manrope', 'Helvetica Neue', Arial, sans-serif;
 }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
